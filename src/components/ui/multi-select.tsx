@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import { X } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command"
+import { Badge } from "./badge"
+import { Command, CommandGroup, CommandItem } from "./command"
 import { Command as CommandPrimitive } from "cmdk"
 
 interface MultiSelectProps {

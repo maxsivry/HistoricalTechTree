@@ -1,4 +1,4 @@
-import TechTreeEditor from '../components/tech-tree-editor'
+import TechTreeEditor from '../components/ui/tech-tree-editor'
 
 export default function Home() {
   return (

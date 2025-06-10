@@ -7,9 +7,9 @@ import { Plus, Minus, Info, ChevronRight, ChevronDown, ChevronUp, X } from "luci
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
 import { cn } from "@/lib/utils"
-import type { TechNode, Era, Century, DisciplineBands } from "../lib/types/tech-tree"
+import type { TechNode, Era, Century, DisciplineBands } from "@/lib/types/tech-tree"
 
 // Replace the eras array with just the Classical Age
 const eras: Era[] = [{ id: "classical", name: "Classical Age", startYear: -800, endYear: -30, color: "bg-purple-700" }]
@@ -286,7 +286,7 @@ export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechT
     let bandPosition = 400 // Default middle position if no match
 
     // Check if any of the node's categories match our discipline bands
-    for (const [bandName, band] of Object.entries(disciplineBands)) {
+    for (const [,band] of Object.entries(disciplineBands)) {
       for (const category of node.category) {
         if (band.categories.includes(category)) {
           bandPosition = band.position
@@ -741,7 +741,7 @@ export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechT
 
           {/* Century Headers */}
           <div className="flex">
-            {centuries.map((century, index) => {
+            {centuries.map((century) => {
               // Skip rendering collapsed centuries
               if (collapsedCenturies.includes(century.id)) {
                 return (

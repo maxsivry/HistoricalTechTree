@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { MultiSelect } from "@/components/multi-select"
+import { MultiSelect } from "@/components/ui/multi-select"
 import { Badge } from "@/components/ui/badge"
 
 interface TechNode {
