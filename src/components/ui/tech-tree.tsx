@@ -50,7 +50,7 @@ const disciplineBands: DisciplineBands = {
     position: 400,
     color: "blue",
   },
-  "Social Studies": {
+  SocialStudies: {
     categories: ["History", "War", "Politics", "Economics", "Society", "Cartography", "Geography"],
     position: 600,
     color: "amber",
@@ -79,7 +79,7 @@ const disciplineBands: DisciplineBands = {
 const availableTags = [
   ...disciplineBands.STEM.categories,
   ...disciplineBands.Humanities.categories,
-  ...disciplineBands["Social Studies"].categories,
+  ...disciplineBands.SocialStudies.categories,
   ...disciplineBands.Geography.categories,
 ]
 

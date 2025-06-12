@@ -3,32 +3,12 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
+import type { TechNode, Era } from "@/lib/types/tech-tree"
 import NodeEditor from "./node-editor"
 import TechTree from "./tech-tree"
 
+
 // Define types for our data structures
-interface TechNode {
-  id: string
-  title: string
-  year: number
-  description: string
-  category: string[]
-  era: string
-  century: string
-  dependencies: string[]
-  links?: { title: string; url: string }[]
-  people?: string[]
-  expanded?: boolean
-}
-
-interface Era {
-  id: string
-  name: string
-  startYear: number
-  endYear: number
-  color: string
-}
-
 // Sample data
 const eras: Era[] = [
   { id: "prehistoric", name: "Prehistoric", startYear: -10000, endYear: -3000, color: "bg-stone-600" },
