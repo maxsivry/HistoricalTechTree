@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import type { TechNode } from "@/types/tech-tree"
+import type { TechNode } from "@/lib/types/tech-tree"
 import { getNodePosition, getCenturyForYear } from "@/utils/tech-tree-utils"
 import TechTreeNode from "./tech-tree-node"
 

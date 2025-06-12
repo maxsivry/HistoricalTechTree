@@ -1,4 +1,4 @@
-import type { TechNode } from "@/types/tech-tree"
+import type { TechNode } from "@/lib/types/tech-tree"
 import { getNodePosition, getCenturyForYear } from "@/utils/tech-tree-utils"
 import TechTreeHeaders from "./tech-tree-headers"
 import TechTreeNodes from "./tech-tree-nodes"

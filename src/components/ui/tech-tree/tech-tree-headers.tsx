@@ -58,7 +58,7 @@ export default function TechTreeHeaders({ collapsedCenturies, onToggleCenturyCol
 
       {/* Century Headers */}
       <div className="flex">
-        {centuries.map((century, index) => {
+        {centuries.map((century) => {
           // Skip rendering collapsed centuries
           if (collapsedCenturies.includes(century.id)) {
             return (

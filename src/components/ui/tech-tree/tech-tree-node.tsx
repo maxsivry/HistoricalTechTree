@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronUp, ChevronDown, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { TechNode } from "@/types/tech-tree"
+import type { TechNode } from "@/lib/types/tech-tree"
 import { getEraForYear } from "@/utils/tech-tree-utils"
 
 interface TechTreeNodeProps {

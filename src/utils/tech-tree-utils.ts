@@ -52,18 +52,15 @@ export const getNodePositionSimple = (
   let bandPosition = 400 // Default middle position if no match
 
   // Check if any of the node's categories match our discipline bands
-  let matchFound = false
-  for (const [name, band] of Object.entries(disciplineBands)) {
+  for (const [, band] of Object.entries(disciplineBands)) {
     for (const category of node.category) {
       if (band.categories.includes(category)) {
         bandPosition = band.position
-        bandName = name
-        matchFound = true
         break
       }
     }
-    if (matchFound) break
   }
+
 
   // Use node ID to create a consistent offset
   const idSum = node.id.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)
