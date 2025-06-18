@@ -2,18 +2,28 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import type { TechNode } from "@/lib/types/tech-tree"
 import { getEraForYear, getCenturyForYear } from "@/utils/tech-tree-utils"
+import { supabase } from "@/lib/supabaseClient" 
+
 
 export const useTechTreeState = (initialNodes: TechNode[] = []) => {
-  const [techNodes, setTechNodes] = useState<TechNode[]>(initialNodes)
-  const [selectedNode, setSelectedNode] = useState<TechNode | null>(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [addDialogOpen, setAddDialogOpen] = useState(false)
-  const [selectedFilterTags, setSelectedFilterTags] = useState<string[]>([])
-  const [isMounted, setIsMounted] = useState(false)
-  const [collapsedCenturies, setCollapsedCenturies] = useState<string[]>([])
+    // --- LAYER 1: Persistent nodes from the database ---
+    const [persistentNodes, setPersistentNodes] = useState<TechNode[]>(initialNodes)
+    // --- LAYER 2: Temporary nodes for the current session ---
+    const [sessionNodes, setSessionNodes] = useState<TechNode[]>([])
+    // --- COMBINED VIEW: A memoized array for the UI to render
+    const techNodes = useMemo(() => {
+      // We combine persistent and session nodes into one array for rendering.
+      return [...persistentNodes, ...sessionNodes]
+    }, [persistentNodes, sessionNodes])
+    const [selectedNode, setSelectedNode] = useState<TechNode | null>(null)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [addDialogOpen, setAddDialogOpen] = useState(false)
+    const [selectedFilterTags, setSelectedFilterTags] = useState<string[]>([])
+    const [isMounted, setIsMounted] = useState(false)
+    const [collapsedCenturies, setCollapsedCenturies] = useState<string[]>([])
 
   // New development form state
   const [newDevelopment, setNewDevelopment] = useState<{
@@ -36,15 +46,54 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
 
   const [newLink, setNewLink] = useState({ title: "", url: "" })
 
+  // this useEffect now ONLY manages persistent data from supabase
+  useEffect(() => {
+    // Set the initial persistent nodes from the server props
+    setPersistentNodes(initialNodes)
+    
+    const channel = supabase.channel('realtime-developments')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'developments' },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newNode = { ...payload.new, expanded: false } as TechNode
+            setPersistentNodes((currentNodes) => [...currentNodes, newNode])
+          }
+
+          if (payload.eventType === 'UPDATE') {
+            const updatedNode = payload.new as TechNode
+            setPersistentNodes((currentNodes) =>
+              currentNodes.map((node) =>
+                node.id === updatedNode.id ? { ...node, ...updatedNode } : node
+              )
+            )
+          }
+
+          if (payload.eventType === 'DELETE') {
+            const deletedNodeId = payload.old.id
+            setPersistentNodes((currentNodes) => {
+                let updated = currentNodes.filter((node) => node.id !== deletedNodeId);
+                updated = updated.map(node => ({
+                    ...node,
+                    dependencies: node.dependencies.filter(dep => dep !== deletedNodeId)
+                }));
+                return updated;
+            });
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [initialNodes])
+
   // Set isMounted to true after component mounts
   useEffect(() => {
     setIsMounted(true)
   }, [])
-
-  // Update techNodes when nodes prop changes
-  useEffect(() => {
-    setTechNodes(initialNodes)
-  }, [initialNodes])
 
   // Toggle century collapse state
   const toggleCenturyCollapse = (centuryId: string) => {
@@ -53,9 +102,24 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     )
   }
 
-  // Toggle node expansion
+  // Toggle node expansion state
   const toggleNodeExpansion = (nodeId: string) => {
-    setTechNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, expanded: !node.expanded } : node)))
+    let wasInSession = false;
+    const newSessionNodes = sessionNodes.map(n => {
+        if (n.id === nodeId) {
+            wasInSession = true;
+            return { ...n, expanded: !n.expanded };
+        }
+        return n;
+    });
+
+    if (wasInSession) {
+        setSessionNodes(newSessionNodes);
+    } else {
+        setPersistentNodes(persistentNodes.map(n => 
+            n.id === nodeId ? { ...n, expanded: !n.expanded } : n
+        ));
+    }
   }
 
   // Open node details dialog
@@ -150,20 +214,16 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     })
   }
 
-  // Save the new development
+  // --- MODIFIED: This function now ONLY adds to the session state ---
   const saveDevelopment = () => {
     if (!newDevelopment.title) {
       alert("Please enter a title for the development")
       return
     }
 
-    // Generate a unique ID based on the title
-    const id = newDevelopment.title.toLowerCase().replace(/\s+/g, "-")
-
-    // Convert year to negative if BCE
+    // Generate a session-unique ID to prevent clashes with DB keys.
+    const id = `session-${crypto.randomUUID()}`
     const year = newDevelopment.yearType === "BCE" ? -Math.abs(newDevelopment.year) : Math.abs(newDevelopment.year)
-
-    // Determine era and century based on year
     const era = getEraForYear(year)
     const century = getCenturyForYear(year)
 
@@ -176,28 +236,19 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
       expanded: false,
     }
 
-    // Add the new development to the list
-    setTechNodes((prev) => [...prev, development])
+    // Add the new development to the SESSION list
+    setSessionNodes((prev) => [...prev, development])
 
-    // Reset the form
+    // Reset the form and close the dialog
     setNewDevelopment({
-      title: "",
-      year: 800,
-      yearType: "BCE",
-      description: "",
-      category: [],
-      links: [],
-      dependencies: [],
+      title: "", year: 800, yearType: "BCE", description: "", category: [], links: [], dependencies: [],
     })
-
-    // Close the dialog
     setAddDialogOpen(false)
   }
 
   return {
     // State
     techNodes,
-    setTechNodes,
     selectedNode,
     dialogOpen,
     setDialogOpen,
