@@ -3,53 +3,76 @@ import { useMemo } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { X } from "lucide-react"
-import type { TechNode } from "@/lib/types/tech-tree"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import type { NewDevelopment, TechNode } from "@/lib/types/tech-tree"
 import { availableTags } from "@/constants/tech-tree-constants"
 import { calculateCenturyPositions } from "@/utils/tech-tree-utils"
-import { useTechTreeState } from "@/hooks/use-tech-tree-state"
+// import { useTechTreeState } from "@/hooks/use-tech-tree-state"
 import { useTechTreeInteractions } from "@/hooks/use-tech-tree-interactions"
 import TechTreeControls from "@/components/ui/tech-tree/tech-tree-controls"
 import TechTreeCanvas from "@/components/ui/tech-tree/tech-tree-canvas"
 
+// The props interface is now much larger as it receives everything from the parent
 interface TechTreeProps {
-  nodes?: TechNode[]
-  onEditNode?: (node: TechNode) => void
-  onDeleteNode?: (nodeId: string) => void
+  nodes: TechNode[]
+  onEditNode: (node: TechNode) => void
+  onDeleteNode: (nodeId: string) => void
+  selectedNode: TechNode | null
+  dialogOpen: boolean
+  setDialogOpen: (open: boolean) => void
+  addDialogOpen: boolean
+  setAddDialogOpen: (open: boolean) => void
+  selectedFilterTags: string[]
+  isMounted: boolean
+  collapsedCenturies: string[]
+  newDevelopment: NewDevelopment // You can use a more specific type here
+  newLink: { title: string; url: string }
+  setNewLink: (link: { title: string; url: string }) => void
+  toggleCenturyCollapse: (centuryId: string) => void
+  toggleNodeExpansion: (nodeId: string) => void
+  openNodeDetails: (node: TechNode) => void
+  toggleFilterTag: (tag: string) => void
+  clearFilters: () => void
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  handleYearTypeChange: (type: "BCE" | "CE") => void
+  handleDependencyToggle: (nodeId: string) => void
+  addLink: () => void
+  removeLink: (index: number) => void
+  handleTagToggle: (tag: string) => void
+  saveDevelopment: () => void // Session save
 }
 
-export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechTreeProps) {
-  const {
-    // State
-    techNodes,
-    selectedNode,
-    dialogOpen,
-    setDialogOpen,
-    addDialogOpen,
-    setAddDialogOpen,
-    selectedFilterTags,
-    isMounted,
-    collapsedCenturies,
-    newDevelopment,
-    newLink,
-    setNewLink,
-
-    // Actions
-    toggleCenturyCollapse,
-    toggleNodeExpansion,
-    openNodeDetails,
-    toggleFilterTag,
-    clearFilters,
-    handleInputChange,
-    handleYearTypeChange,
-    handleDependencyToggle,
-    addLink,
-    removeLink,
-    handleTagToggle,
-    saveDevelopment,
-  } = useTechTreeState(nodes)
-
+export default function TechTree({
+  // Destructure all the new props
+  nodes,
+  onEditNode,
+  onDeleteNode,
+  selectedNode,
+  dialogOpen,
+  setDialogOpen,
+  addDialogOpen,
+  setAddDialogOpen,
+  selectedFilterTags,
+  isMounted,
+  collapsedCenturies,
+  newDevelopment,
+  newLink,
+  setNewLink,
+  toggleCenturyCollapse,
+  toggleNodeExpansion,
+  openNodeDetails,
+  toggleFilterTag,
+  clearFilters,
+  handleInputChange,
+  handleYearTypeChange,
+  handleDependencyToggle,
+  addLink,
+  removeLink,
+  handleTagToggle,
+  saveDevelopment,
+}: TechTreeProps) {
+  
   const {
     zoomLevel,
     position,
@@ -98,7 +121,7 @@ export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechT
         ref={containerRef}
       >
         <TechTreeCanvas
-          techNodes={techNodes}
+          techNodes={nodes}
           selectedFilterTags={selectedFilterTags}
           centuryPositions={centuryPositions}
           collapsedCenturies={collapsedCenturies}
@@ -157,7 +180,7 @@ export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechT
                   {selectedNode.dependencies && selectedNode.dependencies.length > 0 ? (
                     <ul className="list-disc pl-5">
                       {selectedNode.dependencies.map((depId) => {
-                        const depNode = techNodes.find((node) => node.id === depId)
+                        const depNode = nodes.find((node) => node.id === depId)
                         return depNode ? <li key={depId}>{depNode.title}</li> : null
                       })}
                     </ul>
@@ -188,17 +211,12 @@ export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechT
                 </TabsContent>
               </Tabs>
 
-              {onEditNode && (
-                <Button onClick={() => onEditNode(selectedNode)} className="mt-4">
-                  Edit Development
-                </Button>
-              )}
-
-              {onDeleteNode && (
-                <Button variant="destructive" onClick={() => onDeleteNode(selectedNode.id)} className="mt-2">
-                  Delete Development
-                </Button>
-              )}
+              <Button onClick={() => onEditNode(selectedNode)} className="mt-4">
+                Edit Persistent Development
+              </Button>
+              <Button variant="destructive" onClick={() => onDeleteNode(selectedNode.id)} className="mt-2">
+                Delete Persistent Development
+              </Button>
             </>
           )}
         </DialogContent>
@@ -214,143 +232,85 @@ export default function TechTree({ nodes = [], onEditNode, onDeleteNode }: TechT
 
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="title" className="text-right">
-                Title
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={newDevelopment.title}
-                onChange={handleInputChange}
-                className="col-span-3 border rounded px-3 py-2"
-              />
+                <label htmlFor="title" className="text-right">Title</label>
+                <input id="title" name="title" value={newDevelopment.title} onChange={handleInputChange} className="col-span-3 border rounded px-3 py-2" />
             </div>
-
+            
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="year" className="text-right">
-                Year
-              </label>
-              <div className="col-span-3 flex items-center">
-                <input
-                  type="number"
-                  id="year"
-                  name="year"
-                  value={newDevelopment.year}
-                  onChange={handleInputChange}
-                  className="border rounded px-3 py-2 w-24"
-                />
-                <Button
-                  variant={newDevelopment.yearType === "BCE" ? "default" : "outline"}
-                  size="sm"
-                  className="ml-2"
-                  onClick={() => handleYearTypeChange("BCE")}
-                >
-                  BCE
-                </Button>
-                <Button
-                  variant={newDevelopment.yearType === "CE" ? "default" : "outline"}
-                  size="sm"
-                  className="ml-2"
-                  onClick={() => handleYearTypeChange("CE")}
-                >
-                  CE
-                </Button>
-              </div>
+                <label htmlFor="year" className="text-right">Year</label>
+                <div className="col-span-3 flex items-center">
+                    <input type="number" id="year" name="year" value={newDevelopment.year} onChange={handleInputChange} className="border rounded px-3 py-2 w-24" />
+                    <Button variant={newDevelopment.yearType === "BCE" ? "default" : "outline"} size="sm" className="ml-2" onClick={() => handleYearTypeChange("BCE")}>BCE</Button>
+                    <Button variant={newDevelopment.yearType === "CE" ? "default" : "outline"} size="sm" className="ml-2" onClick={() => handleYearTypeChange("CE")}>CE</Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-4 items-start gap-4">
-              <label htmlFor="description" className="text-right mt-2">
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={newDevelopment.description}
-                onChange={handleInputChange}
-                className="col-span-3 border rounded px-3 py-2 h-32"
-              />
+                <label htmlFor="description" className="text-right mt-2">Description</label>
+                <textarea id="description" name="description" value={newDevelopment.description} onChange={handleInputChange} className="col-span-3 border rounded px-3 py-2 h-32" />
             </div>
 
             <div className="grid grid-cols-4 items-start gap-4">
-              <label className="text-right mt-2">Tags</label>
-              <div className="col-span-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                <label className="text-right mt-2">Tags</label>
+                <div className="col-span-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                 {availableTags.map((tag) => (
-                  <Button
-                    key={tag}
-                    variant={newDevelopment.category.includes(tag) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleTagToggle(tag)}
-                  >
-                    {tag}
-                  </Button>
+                    <Button key={tag} variant={newDevelopment.category.includes(tag) ? "default" : "outline"} size="sm" onClick={() => handleTagToggle(tag)}>
+                        {tag}
+                    </Button>
                 ))}
-              </div>
+                </div>
             </div>
 
+             {/* --- MODIFICATION START: Add the missing Links UI section --- */}
             <div className="grid grid-cols-4 items-start gap-4">
               <label className="text-right mt-2">Links</label>
               <div className="col-span-3">
                 {newDevelopment.links.map((link, index) => (
                   <div key={index} className="flex items-center mb-2">
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline flex-1"
-                    >
-                      {link.title || "Link"}
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex-1 truncate">
+                      {link.title || link.url}
                     </a>
-                    <Button variant="ghost" size="icon" className="ml-2" onClick={() => removeLink(index)}>
+                    <Button variant="ghost" size="icon" className="ml-2 h-6 w-6" onClick={() => removeLink(index)}>
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Title"
+                    placeholder="Link Title"
                     value={newLink.title}
-                    onChange={(e) => setNewLink((prev) => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
                     className="border rounded px-3 py-2 w-1/2"
                   />
                   <input
                     type="url"
                     placeholder="URL"
                     value={newLink.url}
-                    onChange={(e) => setNewLink((prev) => ({ ...prev, url: e.target.value }))}
+                    onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
                     className="border rounded px-3 py-2 w-1/2"
                   />
-                  <Button onClick={addLink}>Add Link</Button>
+                  <Button onClick={addLink}>Add</Button>
                 </div>
               </div>
             </div>
+            {/* --- MODIFICATION END --- */}
 
             <div className="grid grid-cols-4 items-start gap-4">
-              <label className="text-right mt-2">Dependencies</label>
-              <div className="col-span-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                {techNodes.map((node) => (
-                  <Button
-                    key={node.id}
-                    variant={newDevelopment.dependencies.includes(node.id) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => handleDependencyToggle(node.id)}
-                  >
-                    {node.title}
-                  </Button>
-                ))}
-              </div>
+                <label className="text-right mt-2">Dependencies</label>
+                <div className="col-span-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                    {nodes.map((node) => (
+                        <Button key={node.id} variant={newDevelopment.dependencies.includes(node.id) ? "default" : "outline"} size="sm" onClick={() => handleDependencyToggle(node.id)}>
+                            {node.title}
+                        </Button>
+                    ))}
+                </div>
             </div>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" onClick={saveDevelopment}>
-              Add Development
-            </Button>
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+            <Button type="submit" onClick={saveDevelopment}>Add for Session</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useMemo } from "react"
-import type { TechNode } from "@/lib/types/tech-tree"
+import type { TechNode, NewDevelopment } from "@/lib/types/tech-tree"
 import { getEraForYear, getCenturyForYear } from "@/utils/tech-tree-utils"
 import { supabase } from "@/lib/supabaseClient" 
 
@@ -26,15 +26,7 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     const [collapsedCenturies, setCollapsedCenturies] = useState<string[]>([])
 
   // New development form state
-  const [newDevelopment, setNewDevelopment] = useState<{
-    title: string
-    year: number
-    yearType: "BCE" | "CE"
-    description: string
-    category: string[]
-    links: { title: string; url: string }[]
-    dependencies: string[]
-  }>({
+  const [newDevelopment, setNewDevelopment] = useState<NewDevelopment>({
     title: "",
     year: 800,
     yearType: "BCE",
@@ -103,22 +95,18 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
   }
 
   // Toggle node expansion state
+  // Toggle node expansion state
   const toggleNodeExpansion = (nodeId: string) => {
-    let wasInSession = false;
-    const newSessionNodes = sessionNodes.map(n => {
-        if (n.id === nodeId) {
-            wasInSession = true;
-            return { ...n, expanded: !n.expanded };
-        }
-        return n;
-    });
-
-    if (wasInSession) {
-        setSessionNodes(newSessionNodes);
+    // Check if it's a session node by its ID prefix
+    if (nodeId.startsWith("session-")) {
+      setSessionNodes((prev) =>
+        prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)),
+      )
     } else {
-        setPersistentNodes(persistentNodes.map(n => 
-            n.id === nodeId ? { ...n, expanded: !n.expanded } : n
-        ));
+      // Otherwise, it's a persistent node
+      setPersistentNodes((prev) =>
+        prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)),
+      )
     }
   }
 
@@ -214,7 +202,7 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     })
   }
 
-  // --- MODIFIED: This function now ONLY adds to the session state ---
+  // This function now ONLY adds to the session state ---
   const saveDevelopment = () => {
     if (!newDevelopment.title) {
       alert("Please enter a title for the development")

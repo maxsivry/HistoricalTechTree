@@ -36,3 +36,13 @@ export interface TechNode {
   export interface DisciplineBands {
     [key: string]: DisciplineBand
   }
+
+  export interface NewDevelopment {
+    title: string
+    year: number
+    yearType: "BCE" | "CE"
+    description: string
+    category: string[]
+    links: { title: string; url: string }[]
+    dependencies: string[]
+  }
