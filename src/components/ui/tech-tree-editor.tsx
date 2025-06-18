@@ -7,6 +7,7 @@ import type { TechNode, Era } from "@/lib/types/tech-tree"
 import NodeEditor from "./node-editor"
 import TechTree from "./tech-tree"
 import { supabase } from "@/lib/supabaseClient"; 
+import { useTechTreeState } from "@/hooks/use-tech-tree-state"
 
 interface TechTreeEditorProps {
   initialTechNodes: TechNode[];
@@ -49,71 +50,86 @@ const availableCategories = [
 ]
 
 export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps) {
-  const [techNodes] = useState<TechNode[]>(initialTechNodes)
-  const [editorOpen, setEditorOpen] = useState(false)
-  const [selectedNode, setSelectedNode] = useState<TechNode | null>(null)
+  const {
+    techNodes,
+    selectedNode,
+    dialogOpen,
+    setDialogOpen,
+    addDialogOpen,
+    setAddDialogOpen,
+    selectedFilterTags,
+    isMounted,
+    collapsedCenturies,
+    newDevelopment,
+    newLink,
+    setNewLink,
+    toggleCenturyCollapse,
+    toggleNodeExpansion,
+    openNodeDetails,
+    toggleFilterTag,
+    clearFilters,
+    handleInputChange,
+    handleYearTypeChange,
+    handleDependencyToggle,
+    addLink,
+    removeLink,
+    handleTagToggle,
+    saveDevelopment,
+  } = useTechTreeState(initialTechNodes)
 
-  const handleAddNode = () => {
-    setSelectedNode(null)
-    setEditorOpen(true)
-  }
+   // This state is specific to the NodeEditor (teacher's editor)
+   const [editorOpen, setEditorOpen] = useState(false)
+   const [editingNode, setEditingNode] = useState<TechNode | null>(null)
+ 
+   const handleAddNode = () => {
+     setEditingNode(null) // Clear any previously edited node
+     setEditorOpen(true)
+   }
+ 
+   const handleEditNode = (node: TechNode) => {
+     // We only allow editing of persistent nodes
+     if (node.id.startsWith("session-")) {
+         alert("Session-only nodes cannot be edited persistently. They exist only for your current session.");
+         return;
+     }
+     setEditingNode(node)
+     setEditorOpen(true)
+   }
 
-  const handleEditNode = (node: TechNode) => {
-    setSelectedNode(node)
-    setEditorOpen(true)
-  }
+
 
   
-  const handleSaveNode = async (node: TechNode) => {
-    // Remove the client-side state update for now.
-    // We will handle this with real-time updates in the next phase.
-    if (selectedNode) {
-      // UPDATE existing node
-      const { error } = await supabase
-        .from('developments')
-        .update({ ...node }) // pass the whole node object
-        .eq('id', node.id)
-        .select()
-
-      if (error) {
-        console.error('Error updating node:', error)
-        // Here you should show an error to the user
-      }
+  // This function is for the TEACHER to save a node to the database
+  const handleSaveNodeToDb = async (node: TechNode) => {
+    // If the node has a real ID (not a session ID), it's an update.
+    if (editingNode) {
+      const { error } = await supabase.from("developments").update({ ...node }).eq("id", node.id)
+      if (error) console.error("Error updating node:", error)
     } else {
-      // CREATE new node
-      const { error } = await supabase
-        .from('developments')
-        .insert([
-          { ...node } // pass the whole node object
-        ])
-        .select()
-
-      if (error) {
-        console.error('Error creating node:', error)
-        // Here you should show an error to the user
-      }
+      // Otherwise, it's a new node to be inserted.
+      const { error } = await supabase.from("developments").insert([{ ...node }])
+      if (error) console.error("Error creating node:", error)
     }
+    // The real-time listener will automatically update the UI.
+    setEditorOpen(false); // Close the editor dialog
   }
 
-
-  const handleDeleteNode = async (nodeId: string) => {
-    // We also need to update dependencies in other nodes. This is a bit more complex.
-    // For now, let's just delete the node.
-    const { error } = await supabase
-      .from('developments')
-      .delete()
-      .eq('id', nodeId)
-
-    if (error) {
-      console.error('Error deleting node:', error)
-      // Show an error
+  // This function is for the TEACHER to delete a node from the database
+  const handleDeleteNodeFromDb = async (nodeId: string) => {
+     if (nodeId.startsWith("session-")) {
+        alert("Session-only nodes cannot be deleted from the database.");
+        return;
     }
-
-    // We also need to find any nodes that depend on this one and remove the dependency.
-    // This is best handled with a database function (an "edge function" in Supabase)
-    // for transactional safety, but for now, we can try to do it from the client.
-    // (This part is advanced, can be a next step).
+    const { error } = await supabase.from("developments").delete().eq("id", nodeId)
+    if (error) console.error("Error deleting node:", error)
+    
+    // Close any open dialogs for the deleted node
+    if (selectedNode?.id === nodeId) {
+      setDialogOpen(false);
+    }
+    // The real-time listener will automatically update the UI for all clients.
   }
+  // --- MODIFICATION END ---
 
   return (
     <div className="w-full h-screen flex flex-col">
@@ -124,18 +140,48 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
         </Button>
       </div>
 
-      {/* Tech Tree Component */}
       <div className="flex-1 overflow-hidden">
-        <TechTree nodes={techNodes} onEditNode={handleEditNode} onDeleteNode={handleDeleteNode} />
+        {/* --- MODIFICATION START --- */}
+        {/* Pass all state and handlers down to the TechTree component */}
+        <TechTree
+          nodes={techNodes}
+          onEditNode={handleEditNode}
+          onDeleteNode={handleDeleteNodeFromDb}
+          // Pass all the state and handlers from the hook
+          selectedNode={selectedNode}
+          dialogOpen={dialogOpen}
+          setDialogOpen={setDialogOpen}
+          addDialogOpen={addDialogOpen}
+          setAddDialogOpen={setAddDialogOpen}
+          selectedFilterTags={selectedFilterTags}
+          isMounted={isMounted}
+          collapsedCenturies={collapsedCenturies}
+          newDevelopment={newDevelopment}
+          newLink={newLink}
+          setNewLink={setNewLink}
+          toggleCenturyCollapse={toggleCenturyCollapse}
+          toggleNodeExpansion={toggleNodeExpansion}
+          openNodeDetails={openNodeDetails}
+          toggleFilterTag={toggleFilterTag}
+          clearFilters={clearFilters}
+          handleInputChange={handleInputChange}
+          handleYearTypeChange={handleYearTypeChange}
+          handleDependencyToggle={handleDependencyToggle}
+          addLink={addLink}
+          removeLink={removeLink}
+          handleTagToggle={handleTagToggle}
+          saveDevelopment={saveDevelopment} // This is the session-save
+        />
+        {/* --- MODIFICATION END --- */}
       </div>
 
-      {/* Node Editor Dialog */}
+      {/* Node Editor Dialog for the TEACHER */}
       <NodeEditor
         open={editorOpen}
         onOpenChange={setEditorOpen}
-        node={selectedNode}
-        onSave={handleSaveNode}
-        allNodes={techNodes}
+        node={editingNode}
+        onSave={handleSaveNodeToDb}
+        allNodes={techNodes} // Pass the combined list for dependency selection
         categories={availableCategories}
         eras={eras.map((era) => ({ id: `${era.startYear}-${era.endYear}`, name: era.name }))}
       />
