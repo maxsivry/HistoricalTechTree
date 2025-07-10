@@ -33,7 +33,9 @@ export default function TechTreeControls({
           <Button variant="outline" size="icon" onClick={() => onZoom("in")}>
             <Plus className="h-4 w-4" />
           </Button>
-          <Button onClick={onAddDevelopment} className="ml-4">
+        </div>
+        <div>
+          <Button variant="materialFilled" onClick={onAddDevelopment} className="ml-4">
             <Plus className="h-4 w-4 mr-2" /> Add Development
           </Button>
         </div>

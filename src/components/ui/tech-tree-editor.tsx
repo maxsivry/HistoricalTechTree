@@ -3,27 +3,18 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import type { TechNode, Era } from "@/lib/types/tech-tree"
+import type { TechNode } from "@/lib/types/tech-tree"
 import NodeEditor from "./node-editor"
 import TechTree from "./tech-tree"
 import { supabase } from "@/lib/supabaseClient"; 
 import { useTechTreeState } from "@/hooks/use-tech-tree-state"
 import TeacherLogin from "./teacher-login";
+import { eras } from "@/constants/tech-tree-constants";
 
 
 interface TechTreeEditorProps {
   initialTechNodes: TechNode[];
 }
-
-
-// Define types for our data structures
-// Sample data
-const eras: Era[] = [
-  { id: "prehistoric", name: "Prehistoric", startYear: -10000, endYear: -3000, color: "bg-stone-600" },
-  { id: "ancient", name: "Ancient Civilizations", startYear: -3000, endYear: -800, color: "bg-amber-700" },
-  { id: "classical", name: "Archaic Age", startYear: -800, endYear: 500, color: "bg-purple-700" },
-  { id: "medieval", name: "Classical Age", startYear: 500, endYear: 1400, color: "bg-blue-800" },
-]
 
 
 // Available categories
@@ -135,8 +126,8 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
       <div className="bg-slate-200 dark:bg-slate-800 p-4 flex justify-between items-center border-b">
       <div className="text-2xl font-bold">Historical Tech Tree</div>
         {isTeacher ? (
-          <Button onClick={handleAddNode}>
-            <Plus className="mr-2 h-4 w-4" /> Add Node
+          <Button variant="materialFilled" onClick={handleAddNode}>
+            <Plus className="mr-2 h-4 w-4" /> Add Development to Database
           </Button>
         ) : (
           <TeacherLogin onLogin={setIsTeacher} />

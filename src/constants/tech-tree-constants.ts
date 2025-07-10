@@ -4,7 +4,7 @@ export const eras: Era[] = [
     { id: "prehistoric", name: "Prehistoric", startYear: -10000, endYear: -3000, color: "bg-stone-600" },
     { id: "ancient", name: "Ancient Civilizations", startYear: -3000, endYear: -800, color: "bg-amber-700" },
     { id: "classical", name: "Archaic Age", startYear: -800, endYear: -500, color: "bg-purple-700" },
-    { id: "medieval", name: "Classical Age", startYear: -500, endYear: 300, color: "bg-blue-800" },
+    { id: "medieval", name: "Classical Age", startYear: -500, endYear: -300, color: "bg-blue-800" },
   ]
   
   

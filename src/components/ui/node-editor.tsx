@@ -11,6 +11,10 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { MultiSelect } from "@/components/ui/multi-select"
 import { Badge } from "@/components/ui/badge"
+import { disciplineBands } from "@/constants/tech-tree-constants";
+
+
+
 
 interface TechNode {
   id: string
@@ -35,28 +39,6 @@ interface NodeEditorProps {
   eras: { id: string; name: string }[]
 }
 
-const disciplineBands = {
-  "Social Science": {
-    categories: ["Sociology", "Political Science", "Economics", "Anthropology", "Psychology"],
-    color: "blue",
-  },
-  "Formal Science": {
-    categories: ["Mathematics", "Statistics", "Logic", "Systems Theory", "Decision Theory"],
-    color: "orange",
-  },
-  "Natural Science": {
-    categories: ["Physics", "Chemistry", "Biology", "Astronomy", "Geology", "Ecology"],
-    color: "green",
-  },
-  "Applied Science": {
-    categories: ["Computer Science", "Engineering", "Medicine", "Agriculture", "Materials Science"],
-    color: "purple",
-  },
-  Humanities: {
-    categories: ["History", "Literature", "Philosophy", "Religion", "Art", "Music"],
-    color: "red",
-  },
-}
 
 export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes, categories, eras }: NodeEditorProps) {
   const isNewNode = !node?.id
@@ -82,6 +64,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
 
   const [newLink, setNewLink] = useState({ title: "", url: "" })
   const [newPerson, setNewPerson] = useState("")
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target

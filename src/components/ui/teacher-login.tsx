@@ -44,7 +44,7 @@ export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Enter teacher password"
       />
-      <Button onClick={handleLogin}>Login as Teacher</Button>
+      <Button variant="materialFilled" onClick={handleLogin}>Login as Teacher</Button>
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
