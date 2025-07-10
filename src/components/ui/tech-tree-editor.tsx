@@ -8,6 +8,8 @@ import NodeEditor from "./node-editor"
 import TechTree from "./tech-tree"
 import { supabase } from "@/lib/supabaseClient"; 
 import { useTechTreeState } from "@/hooks/use-tech-tree-state"
+import TeacherLogin from "./teacher-login";
+
 
 interface TechTreeEditorProps {
   initialTechNodes: TechNode[];
@@ -72,10 +74,12 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
     handleTagToggle,
     saveDevelopment,
   } = useTechTreeState(initialTechNodes)
+  
 
    // This state is specific to the NodeEditor (teacher's editor)
    const [editorOpen, setEditorOpen] = useState(false)
    const [editingNode, setEditingNode] = useState<TechNode | null>(null)
+   const [isTeacher, setIsTeacher] = useState(false);
  
    const handleAddNode = () => {
      setEditingNode(null) // Clear any previously edited node
@@ -129,14 +133,17 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="bg-slate-200 dark:bg-slate-800 p-4 flex justify-between items-center border-b">
-        <div className="text-2xl font-bold">teacher tab</div>
-        <Button onClick={handleAddNode}>
-          <Plus className="mr-2 h-4 w-4" /> Add *Persistent* Developement
-        </Button>
+      <div className="text-2xl font-bold">Historical Tech Tree</div>
+        {isTeacher ? (
+          <Button onClick={handleAddNode}>
+            <Plus className="mr-2 h-4 w-4" /> Add Node
+          </Button>
+        ) : (
+          <TeacherLogin onLogin={setIsTeacher} />
+        )}
       </div>
 
       <div className="flex-1 overflow-hidden">
-        {/* --- MODIFICATION START --- */}
         {/* Pass all state and handlers down to the TechTree component */}
         <TechTree
           nodes={techNodes}

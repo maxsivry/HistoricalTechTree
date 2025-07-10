@@ -25,7 +25,6 @@ export default function TechTreeControls({
   return (
     <div className="bg-slate-200 dark:bg-slate-800 p-4 flex flex-col gap-2 border-b">
       <div className="flex justify-between items-center">
-        <div className="text-xl font-bold">Historical Tech Tree</div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => onZoom("out")}>
             <Minus className="h-4 w-4" />
