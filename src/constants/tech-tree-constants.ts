@@ -3,13 +3,10 @@ import type { Era, Century, DisciplineBands } from "@/lib/types/tech-tree"
 export const eras: Era[] = [
     { id: "prehistoric", name: "Prehistoric", startYear: -10000, endYear: -3000, color: "bg-stone-600" },
     { id: "ancient", name: "Ancient Civilizations", startYear: -3000, endYear: -800, color: "bg-amber-700" },
-    { id: "classical", name: "Classical Age", startYear: -800, endYear: 500, color: "bg-purple-700" },
-    { id: "medieval", name: "Medieval Period", startYear: 500, endYear: 1400, color: "bg-blue-800" },
-    { id: "renaissance", name: "Renaissance", startYear: 1400, endYear: 1700, color: "bg-emerald-700" },
-    { id: "industrial", name: "Industrial Age", startYear: 1700, endYear: 1900, color: "bg-orange-700" },
-    { id: "modern", name: "Modern Era", startYear: 1900, endYear: 2000, color: "bg-red-700" },
-    { id: "information", name: "Information Age", startYear: 2000, endYear: 2100, color: "bg-cyan-700" },
+    { id: "classical", name: "Archaic Age", startYear: -800, endYear: 500, color: "bg-purple-700" },
+    { id: "medieval", name: "Classical Age", startYear: 500, endYear: 1400, color: "bg-blue-800" },
   ]
+  
   
   export const centuries: Century[] = [
     // BCE

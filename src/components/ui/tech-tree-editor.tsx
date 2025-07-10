@@ -19,12 +19,8 @@ interface TechTreeEditorProps {
 const eras: Era[] = [
   { id: "prehistoric", name: "Prehistoric", startYear: -10000, endYear: -3000, color: "bg-stone-600" },
   { id: "ancient", name: "Ancient Civilizations", startYear: -3000, endYear: -800, color: "bg-amber-700" },
-  { id: "classical", name: "Classical Age", startYear: -800, endYear: 500, color: "bg-purple-700" },
-  { id: "medieval", name: "Medieval Period", startYear: 500, endYear: 1400, color: "bg-blue-800" },
-  { id: "renaissance", name: "Renaissance", startYear: 1400, endYear: 1700, color: "bg-emerald-700" },
-  { id: "industrial", name: "Industrial Age", startYear: 1700, endYear: 1900, color: "bg-orange-700" },
-  { id: "modern", name: "Modern Era", startYear: 1900, endYear: 2000, color: "bg-red-700" },
-  { id: "information", name: "Information Age", startYear: 2000, endYear: 2100, color: "bg-cyan-700" },
+  { id: "classical", name: "Archaic Age", startYear: -800, endYear: 500, color: "bg-purple-700" },
+  { id: "medieval", name: "Classical Age", startYear: 500, endYear: 1400, color: "bg-blue-800" },
 ]
 
 
@@ -129,14 +125,13 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
     }
     // The real-time listener will automatically update the UI for all clients.
   }
-  // --- MODIFICATION END ---
 
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="bg-slate-200 dark:bg-slate-800 p-4 flex justify-between items-center border-b">
-        <div className="text-2xl font-bold">Historical Tech Tree Editor</div>
+        <div className="text-2xl font-bold">teacher tab</div>
         <Button onClick={handleAddNode}>
-          <Plus className="mr-2 h-4 w-4" /> Add Node
+          <Plus className="mr-2 h-4 w-4" /> Add *Persistent* Developement
         </Button>
       </div>
 
@@ -172,7 +167,6 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
           handleTagToggle={handleTagToggle}
           saveDevelopment={saveDevelopment} // This is the session-save
         />
-        {/* --- MODIFICATION END --- */}
       </div>
 
       {/* Node Editor Dialog for the TEACHER */}
