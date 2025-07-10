@@ -175,7 +175,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isNewNode ? "Add New Node" : "Edit Node"}</DialogTitle>
+          <DialogTitle>{isNewNode ? "Add New Development" : "Edit Development"}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
