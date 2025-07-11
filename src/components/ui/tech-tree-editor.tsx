@@ -70,8 +70,7 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
    // This state is specific to the NodeEditor (teacher's editor)
    const [editorOpen, setEditorOpen] = useState(false)
    const [editingNode, setEditingNode] = useState<TechNode | null>(null)
-   const [isTeacher, setIsTeacher] = useState(false);
- 
+   const [isTeacher, setIsTeacher] = useState(false); 
    const handleAddNode = () => {
      setEditingNode(null) // Clear any previously edited node
      setEditorOpen(true)

@@ -2,7 +2,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { MultiSelect } from "@/components/ui/multi-select"
 import { Badge } from "@/components/ui/badge"
 import { disciplineBands } from "@/constants/tech-tree-constants";
+import { validateTitle, validateYear } from "@/lib/validate";
 
 
 
@@ -64,6 +64,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
 
   const [newLink, setNewLink] = useState({ title: "", url: "" })
   const [newPerson, setNewPerson] = useState("")
+  const [errors, setErrors] = useState<{ title?: string; year?: string }>({});
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -111,6 +112,23 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
   }
 
   const handleSave = () => {
+    const titleError = validateTitle(formData.title);
+    const yearError = validateYear(formData.year);
+
+    const newErrors: { title?: string; year?: string } = {};
+    if (titleError) {
+      newErrors.title = titleError;
+    }
+    if (yearError) {
+      newErrors.year = yearError;
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    setErrors({});
     // Generate ID from title if new node
     const nodeToSave = {
       ...formData,
@@ -167,6 +185,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
               Title
             </Label>
             <Input id="title" name="title" value={formData.title} onChange={handleInputChange} className="col-span-3" />
+            {errors.title && <p className="col-span-4 text-red-500 text-xs text-right">{errors.title}</p>}
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
@@ -184,6 +203,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
               />
               <span>{formData.year < 0 ? "BCE" : "CE"}</span>
             </div>
+            {errors.year && <p className="col-span-4 text-red-500 text-xs text-right">{errors.year}</p>}
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">

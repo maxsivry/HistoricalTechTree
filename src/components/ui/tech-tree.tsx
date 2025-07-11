@@ -8,10 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { NewDevelopment, TechNode } from "@/lib/types/tech-tree"
 import { availableTags } from "@/constants/tech-tree-constants"
 import { calculateCenturyPositions } from "@/utils/tech-tree-utils"
-// import { useTechTreeState } from "@/hooks/use-tech-tree-state"
 import { useTechTreeInteractions } from "@/hooks/use-tech-tree-interactions"
 import TechTreeControls from "@/components/ui/tech-tree/tech-tree-controls"
 import TechTreeCanvas from "@/components/ui/tech-tree/tech-tree-canvas"
+
+
 
 // The props interface is now much larger as it receives everything from the parent
 interface TechTreeProps {
@@ -83,6 +84,7 @@ export default function TechTree({
     handleMouseUp,
     handleWheel,
   } = useTechTreeInteractions()
+
 
   // Calculate century positions based on which ones are collapsed
   const centuryPositions = useMemo(() => {
@@ -261,7 +263,6 @@ export default function TechTree({
                 </div>
             </div>
 
-             {/* --- MODIFICATION START: Add the missing Links UI section --- */}
             <div className="grid grid-cols-4 items-start gap-4">
               <label className="text-right mt-2">Links</label>
               <div className="col-span-3">
@@ -294,7 +295,6 @@ export default function TechTree({
                 </div>
               </div>
             </div>
-            {/* --- MODIFICATION END --- */}
 
             <div className="grid grid-cols-4 items-start gap-4">
                 <label className="text-right mt-2">Dependencies</label>
