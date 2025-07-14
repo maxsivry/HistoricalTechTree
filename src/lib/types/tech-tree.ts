@@ -1,12 +1,12 @@
 export interface TechNode {
-    id: string
+    id: string | number;
     title: string
     year: number
-    description: string
-    category: string[]
-    era: string
-    century: string
-    dependencies: string[]
+    description?: string
+    category?: string[]
+    era?: string
+    century?: string
+    dependencies?: string[]
     links?: { title: string; url: string }[]
     people?: string[]
     expanded?: boolean

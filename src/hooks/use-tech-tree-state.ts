@@ -234,6 +234,19 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     setAddDialogOpen(false)
   }
 
+  const removeNodeFromSession = (nodeId: string) => {
+    setSessionNodes((prev) => prev.filter((node) => node.id !== nodeId));
+    // Also remove as a dependency from other session nodes
+    setSessionNodes((prev) => prev.map(n => ({
+        ...n,
+        dependencies: n.dependencies?.filter(dep => dep !== nodeId)
+    })));
+    // Close the dialog if the deleted node was selected
+    if (selectedNode?.id === nodeId) {
+        setDialogOpen(false);
+    }
+  };
+
   return {
     // State
     techNodes,
@@ -262,5 +275,6 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     removeLink,
     handleTagToggle,
     saveDevelopment,
+    removeNodeFromSession,
   }
 }

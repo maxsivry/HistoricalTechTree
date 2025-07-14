@@ -159,7 +159,7 @@ export default function TechTree({
 
                 <TabsContent value="overview" className="space-y-4">
                   <div className="flex flex-wrap gap-1 mb-4">
-                    {selectedNode.category.map((cat) => (
+                    {(selectedNode.category || []).map((cat) => (
                       <Badge key={cat}>{cat}</Badge>
                     ))}
                   </div>
@@ -216,7 +216,7 @@ export default function TechTree({
               <Button onClick={() => onEditNode(selectedNode)} className="mt-4">
                 Edit Persistent Development
               </Button>
-              <Button variant="destructive" onClick={() => onDeleteNode(selectedNode.id)} className="mt-2">
+              <Button variant="destructive" onClick={() => onDeleteNode(String(selectedNode.id))} className="mt-2">
                 Delete Persistent Development
               </Button>
             </>
@@ -300,7 +300,7 @@ export default function TechTree({
                 <label className="text-right mt-2">Dependencies</label>
                 <div className="col-span-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                     {nodes.map((node) => (
-                        <Button key={node.id} variant={newDevelopment.dependencies.includes(node.id) ? "default" : "outline"} size="sm" onClick={() => handleDependencyToggle(node.id)}>
+                        <Button key={node.id} variant={newDevelopment.dependencies.includes(String(node.id)) ? "default" : "outline"} size="sm" onClick={() => handleDependencyToggle(String(node.id))}>
                             {node.title}
                         </Button>
                     ))}

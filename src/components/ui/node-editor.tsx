@@ -12,22 +12,7 @@ import { MultiSelect } from "@/components/ui/multi-select"
 import { Badge } from "@/components/ui/badge"
 import { disciplineBands } from "@/constants/tech-tree-constants";
 import { validateTitle, validateYear } from "@/lib/validate";
-
-
-
-
-interface TechNode {
-  id: string
-  title: string
-  year: number
-  description: string
-  category: string[]
-  era: string
-  century: string
-  dependencies: string[]
-  links?: { title: string; url: string }[]
-  people?: string[]
-}
+import type { TechNode } from "@/lib/types/tech-tree";
 
 interface NodeEditorProps {
   open: boolean
@@ -213,7 +198,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
             <Textarea
               id="description"
               name="description"
-              value={formData.description}
+              value={formData.description || ''}
               onChange={handleInputChange}
               className="col-span-3"
               rows={4}
@@ -227,7 +212,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
                 <p className="text-sm text-muted-foreground mb-1">Select discipline categories:</p>
                 <MultiSelect
                   options={categories.map((cat) => ({ label: cat, value: cat }))}
-                  selected={formData.category}
+                  selected={formData.category || []}
                   onChange={handleCategoryChange}
                   placeholder="Select categories..."
                 />
@@ -236,7 +221,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
                 <p className="text-sm text-muted-foreground mb-1">Discipline placement:</p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {Object.entries(disciplineBands).map(([name, band]) => {
-                    const hasCategory = formData.category.some((cat) => band.categories.includes(cat))
+                    const hasCategory = (formData.category || []).some((cat) => band.categories.includes(cat))
                     return (
                       <Badge
                         key={name}
@@ -256,8 +241,8 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
             <Label className="text-right">Dependencies</Label>
             <div className="col-span-3">
               <MultiSelect
-                options={allNodes.filter((n) => n.id !== formData.id).map((n) => ({ label: n.title, value: n.id }))}
-                selected={formData.dependencies}
+                options={allNodes.filter((n) => n.id !== formData.id).map((n) => ({ label: n.title, value: String(n.id) }))}
+                selected={formData.dependencies || []}
                 onChange={handleDependenciesChange}
                 placeholder="Select dependencies..."
               />

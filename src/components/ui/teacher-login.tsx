@@ -16,7 +16,7 @@ export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data: _data, error } = await supabase.auth.signInWithPassword({
       email: "maxssivry@gmail.com", 
       password,
     });
@@ -26,14 +26,8 @@ export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
       return;
     }
 
-    // Check for the 'teacher' role in the user's claims
-    const userRoles = data.user?.app_metadata?.roles || [];
-    if (userRoles.includes("teacher")) {
-      onLogin(true);
-    } else {
-      setError("You do not have teacher privileges.");
-      onLogin(false);
-    }
+    // If login is successful, grant teacher access for the session.
+    onLogin(true);
   };
 
   return (
