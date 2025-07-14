@@ -21,7 +21,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-slate-100 dark:bg-slate-900">
-      {/* Pass the fetched data as a prop */}
+      
       <TechTreeEditor initialTechNodes={processedNodes} />
     </main>
   )

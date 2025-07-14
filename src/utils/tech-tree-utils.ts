@@ -6,6 +6,12 @@ export const getCenturyForYear = (year: number) => {
   return centuries.find((century) => year >= century.startYear && year <= century.endYear)
 }
 
+// Type guard to check if a node is a session node
+export const isSessionNode = (nodeId: string | number): nodeId is string => {
+	return typeof nodeId === "string" && nodeId.startsWith("session-");
+  };
+  
+
 // Get era for a specific year
 export const getEraForYear = (year: number) => {
   return eras.find((era) => year >= era.startYear && year <= era.endYear)
