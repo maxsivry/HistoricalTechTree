@@ -68,8 +68,8 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
                 let updated = currentNodes.filter((node) => node.id !== deletedNodeId);
                 updated = updated.map(node => ({
                     ...node,
-                    dependencies: node.dependencies.filter(dep => dep !== deletedNodeId)
-                }));
+                    dependencies: node.dependencies?.filter(dep => dep !== deletedNodeId) ?? []
+                  }));
                 return updated;
             });
           }

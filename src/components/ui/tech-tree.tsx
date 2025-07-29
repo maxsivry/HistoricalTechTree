@@ -19,6 +19,7 @@ interface TechTreeProps {
   nodes: TechNode[]
   onEditNode: (node: TechNode) => void
   onDeleteNode: (nodeId: string) => void
+  isTeacher: boolean
   selectedNode: TechNode | null
   dialogOpen: boolean
   setDialogOpen: (open: boolean) => void
@@ -49,6 +50,7 @@ export default function TechTree({
   nodes,
   onEditNode,
   onDeleteNode,
+  isTeacher,
   selectedNode,
   dialogOpen,
   setDialogOpen,
@@ -213,12 +215,16 @@ export default function TechTree({
                 </TabsContent>
               </Tabs>
 
-              <Button onClick={() => onEditNode(selectedNode)} className="mt-4">
-                Edit Persistent Development
-              </Button>
-              <Button variant="destructive" onClick={() => onDeleteNode(String(selectedNode.id))} className="mt-2">
-                Delete Persistent Development
-              </Button>
+              {isTeacher && (
+                <>
+                  <Button onClick={() => onEditNode(selectedNode)} className="mt-4">
+                    Edit Persistent Development
+                  </Button>
+                  <Button variant="destructive" onClick={() => onDeleteNode(String(selectedNode.id))} className="mt-2">
+                    Delete Persistent Development
+                  </Button>
+                </>
+              )}
             </>
           )}
         </DialogContent>

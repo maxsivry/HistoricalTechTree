@@ -81,14 +81,18 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
    }
  
    const handleEditNode = (node: TechNode) => {
-     // We only allow editing of persistent nodes
-     if (isSessionNode(node.id)) {
-         alert("Session-only nodes cannot be edited persistently. They exist only for your current session.");
-         return;
-     }
-     setEditingNode(node)
-     setEditorOpen(true)
-   }
+    if (!isTeacher && !isSessionNode(node.id)) {
+      alert("This historical event has been set by the teacher.");
+      return;
+    }
+    // We only allow editing of persistent nodes
+    if (isSessionNode(node.id)) {
+        alert("Session-only nodes cannot be edited persistently. They exist only for your current session.");
+        return;
+    }
+    setEditingNode(node)
+    setEditorOpen(true)
+  }
 
 
 
@@ -122,6 +126,10 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
 
   // This function handles deletion for both session and persistent nodes
   const handleDeleteNode = async (nodeId: string | number) => {
+    if (!isTeacher && !isSessionNode(nodeId)) {
+      alert("This historical event has been set by the teacher.");
+      return;
+    }
     console.log("Attempting to delete node:", nodeId);
     if (isSessionNode(nodeId)) {
       // It's a session node, remove it from local state
@@ -165,6 +173,7 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
           nodes={techNodes}
           onEditNode={handleEditNode}
           onDeleteNode={handleDeleteNode}
+          isTeacher={isTeacher}
           // Pass all the state and handlers from the hook
           selectedNode={selectedNode}
           dialogOpen={dialogOpen}
