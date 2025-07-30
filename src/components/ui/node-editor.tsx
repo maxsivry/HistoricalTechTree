@@ -24,15 +24,16 @@ interface NodeEditorProps {
   eras: { id: string; name: string }[]
 }
 
+type NodeFormData = Omit<TechNode, "year"> & { year: string | number }
 
 export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes, categories, eras }: NodeEditorProps) {
   const isNewNode = !node?.id
 
-  const [formData, setFormData] = useState<TechNode>(
+  const [formData, setFormData] = useState<NodeFormData>(
     node || {
       id: "",
       title: "",
-      year: 0,
+      year: "",
       description: "",
       category: [],
       era: "",
@@ -42,6 +43,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
       people: [],
     },
   )
+  const [yearType, setYearType] = useState<"BCE" | "CE">("CE")
 
   const [links, setLinks] = useState<{ title: string; url: string }[]>(node?.links || [])
 
@@ -56,7 +58,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "year" ? Number.parseInt(value) || 0 : value,
+      [name]: name === "year" ? value : value,
     }))
   }
 
@@ -66,6 +68,10 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
       category: selected,
     }))
   }
+
+  const handleYearTypeChange = (type: "BCE" | "CE") => {
+    setYearType(type);
+  };
 
   const handleDependenciesChange = (selected: string[]) => {
     setFormData((prev) => ({
@@ -98,7 +104,18 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
 
   const handleSave = () => {
     const titleError = validateTitle(formData.title);
-    const yearError = validateYear(formData.year);
+
+    const yearAsNumber = Number(formData.year);
+    const finalYear = yearType === "BCE" ? -Math.abs(yearAsNumber) : Math.abs(yearAsNumber);
+
+    let yearError: string | null = null;
+    if (formData.year === "") {
+      yearError = "Year is required.";
+    } else if (isNaN(yearAsNumber)) {
+      yearError = "Year must be a number.";
+    } else {
+      yearError = validateYear(finalYear);
+    }
 
     const newErrors: { title?: string; year?: string } = {};
     if (titleError) {
@@ -112,14 +129,15 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
       setErrors(newErrors);
       return;
     }
-    
+
     setErrors({});
     // Generate ID from title if new node
-    const nodeToSave = {
+    const nodeToSave: TechNode = {
       ...formData,
       id: formData.id || formData.title.toLowerCase().replace(/\s+/g, "-"),
       links,
       people,
+      year: finalYear,
     }
 
     // Determine century based on year
@@ -181,12 +199,13 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
               <Input
                 id="year"
                 name="year"
-                type="number"
+                type="text"
                 value={formData.year}
                 onChange={handleInputChange}
                 className="w-32"
               />
-              <span>{formData.year < 0 ? "BCE" : "CE"}</span>
+              <Button variant={yearType === "BCE" ? "default" : "outline"} size="sm" className="ml-2" onClick={() => handleYearTypeChange("BCE")}>BCE</Button>
+              <Button variant={yearType === "CE" ? "default" : "outline"} size="sm" className="ml-2" onClick={() => handleYearTypeChange("CE")}>CE</Button>
             </div>
             {errors.year && <p className="col-span-4 text-red-500 text-xs text-right">{errors.year}</p>}
           </div>

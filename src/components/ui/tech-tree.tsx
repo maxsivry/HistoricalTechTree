@@ -247,7 +247,7 @@ export default function TechTree({
             <div className="grid grid-cols-4 items-center gap-4">
                 <label htmlFor="year" className="text-right">Year</label>
                 <div className="col-span-3 flex items-center">
-                    <input type="number" id="year" name="year" value={newDevelopment.year} onChange={handleInputChange} className="border rounded px-3 py-2 w-24" />
+                    <input type="text" pattern="[0-9]*" id="year" name="year" value={newDevelopment.year} onChange={handleInputChange} className="border rounded px-3 py-2 w-24" />
                     <Button variant={newDevelopment.yearType === "BCE" ? "default" : "outline"} size="sm" className="ml-2" onClick={() => handleYearTypeChange("BCE")}>BCE</Button>
                     <Button variant={newDevelopment.yearType === "CE" ? "default" : "outline"} size="sm" className="ml-2" onClick={() => handleYearTypeChange("CE")}>CE</Button>
                 </div>

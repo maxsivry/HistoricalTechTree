@@ -137,17 +137,27 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     const { name, value } = e.target
     setNewDevelopment((prev) => ({
       ...prev,
-      [name]: name === "year" ? Math.abs(Number.parseInt(value) || 0) : value,
+      [name]: name === "year" ? (value === "" ? "" : Number(value)) : value,
     }))
   }
 
   // Handle year type change
   const handleYearTypeChange = (type: "BCE" | "CE") => {
-    setNewDevelopment((prev) => ({
-      ...prev,
-      yearType: type,
-    }))
-  }
+    setNewDevelopment(prev => {
+      const currentYear = Number(prev.year);
+      if (isNaN(currentYear)) {
+        return { ...prev, yearType: type };
+      }
+      
+      const year = type === "BCE" ? -Math.abs(currentYear) : Math.abs(currentYear);
+      
+      return {
+        ...prev,
+        yearType: type,
+        year: year,
+      };
+    });
+  };
 
   // Handle dependency selection
   const handleDependencyToggle = (nodeId: string) => {
