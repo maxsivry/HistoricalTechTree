@@ -48,7 +48,6 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, onDelete,
   const [newLink, setNewLink] = useState({ title: "", url: "" })
   const [newPerson, setNewPerson] = useState("")
   const [errors, setErrors] = useState<{ title?: string; year?: string }>({});
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -205,39 +204,20 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, onDelete,
 
         {!isNewNode && (
           <div className="flex justify-end mt-2">
-            <Button variant="destructive" onClick={() => setConfirmDeleteOpen(true)}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (node?.id && onDelete) {
+                  onDelete(node.id)
+                }
+                onOpenChange(false)
+              }}
+            >
               Delete Persistent Development
             </Button>
           </div>
         )}
       </DialogContent>
-
-      {/* Confirm Delete Dialog */}
-      {!isNewNode && (
-        <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Confirm Deletion</DialogTitle>
-            </DialogHeader>
-            <p>This will delete the node from the database, are you sure?</p>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (node?.id && onDelete) {
-                    onDelete(node.id)
-                  }
-                  setConfirmDeleteOpen(false)
-                  onOpenChange(false)
-                }}
-              >
-                Confirm
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </Dialog>
   )
 }
