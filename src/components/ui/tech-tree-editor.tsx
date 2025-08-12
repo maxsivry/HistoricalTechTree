@@ -90,6 +90,8 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
         alert("Session-only nodes cannot be edited persistently. They exist only for your current session.");
         return;
     }
+    // Close the details dialog before opening the editor to avoid nested modals
+    setDialogOpen(false)
     setEditingNode(node)
     setEditorOpen(true)
   }
@@ -207,6 +209,7 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
         onOpenChange={setEditorOpen}
         node={editingNode}
         onSave={handleSaveNodeToDb}
+        onDelete={(id) => handleDeleteNode(id)}
         allNodes={techNodes} // Pass the combined list for dependency selection
         categories={availableCategories}
         eras={eras.map((era) => ({ id: `${era.startYear}-${era.endYear}`, name: era.name }))}

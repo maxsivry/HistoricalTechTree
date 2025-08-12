@@ -7,12 +7,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { validateTitle, validateYear } from "@/lib/validate";
 import type { TechNode } from "@/lib/types/tech-tree";
 import PersistantNodeForm from "@/components/ui/persistant-node-form"
+import { Button } from "./button";
 
 interface NodeEditorProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   node?: TechNode | null
   onSave: (node: TechNode) => void
+  onDelete?: (id: string | number) => void
   allNodes: TechNode[]
   categories: string[]
   eras: { id: string; name: string }[]
@@ -20,7 +22,7 @@ interface NodeEditorProps {
 
 type NodeFormData = Omit<TechNode, "year"> & { year: string | number }
 
-export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes, categories, eras }: NodeEditorProps) {
+export default function NodeEditor({ open, onOpenChange, node, onSave, onDelete, allNodes, categories, eras }: NodeEditorProps) {
   const isNewNode = !node?.id
 
   const [formData, setFormData] = useState<NodeFormData>(
@@ -46,6 +48,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
   const [newLink, setNewLink] = useState({ title: "", url: "" })
   const [newPerson, setNewPerson] = useState("")
   const [errors, setErrors] = useState<{ title?: string; year?: string }>({});
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -199,7 +202,42 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
           onCancel={() => onOpenChange(false)}
           onSave={handleSave}
         />
+
+        {!isNewNode && (
+          <div className="flex justify-end mt-2">
+            <Button variant="destructive" onClick={() => setConfirmDeleteOpen(true)}>
+              Delete Persistent Development
+            </Button>
+          </div>
+        )}
       </DialogContent>
+
+      {/* Confirm Delete Dialog */}
+      {!isNewNode && (
+        <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+            </DialogHeader>
+            <p>This will delete the node from the database, are you sure?</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setConfirmDeleteOpen(false)}>Cancel</Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (node?.id && onDelete) {
+                    onDelete(node.id)
+                  }
+                  setConfirmDeleteOpen(false)
+                  onOpenChange(false)
+                }}
+              >
+                Confirm
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   )
 }

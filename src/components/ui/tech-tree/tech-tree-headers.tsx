@@ -9,27 +9,28 @@ interface TechTreeHeadersProps {
   onToggleEraCollapse: (eraId: string) => void
   showEraBanner?: boolean
   showBandLabels?: boolean
+  bandLabelsLeft?: number
 }
 
-export default function TechTreeHeaders({ collapsedCenturies, collapsedEras, onToggleEraCollapse, showEraBanner = true, showBandLabels = true }: TechTreeHeadersProps) {
+export default function TechTreeHeaders({ collapsedCenturies, collapsedEras, onToggleEraCollapse, showEraBanner = true, showBandLabels = true, bandLabelsLeft = -128 }: TechTreeHeadersProps) {
   return (
     <>
       {showBandLabels && (
         <>
-          {/* Discipline Band Labels - Fixed positioning relative to scrollable content */}
-          <div className="absolute -left-32 top-[200px] -translate-y-1/2 font-bold text-lg text-emerald-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow">
+          {/* Discipline Band Labels */}
+          <div className="absolute top-[200px] -translate-y-1/2 font-bold text-lg text-emerald-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow" style={{ left: bandLabelsLeft }}>
             STEM
             <div className="text-xs font-normal mt-1 max-w-[120px] text-emerald-600">Math, Physics, Engineering...</div>
           </div>
-          <div className="absolute -left-32 top-[400px] -translate-y-1/2 font-bold text-lg text-blue-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow">
+          <div className="absolute top-[400px] -translate-y-1/2 font-bold text-lg text-blue-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow" style={{ left: bandLabelsLeft }}>
             Humanities
             <div className="text-xs font-normal mt-1 max-w-[120px] text-blue-600">Philosophy, Literature, Art...</div>
           </div>
-          <div className="absolute -left-32 top-[600px] -translate-y-1/2 font-bold text-lg text-amber-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow">
+          <div className="absolute top-[600px] -translate-y-1/2 font-bold text-lg text-amber-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow" style={{ left: bandLabelsLeft }}>
             Social Studies
             <div className="text-xs font-normal mt-1 max-w-[120px] text-amber-600">History, Politics, Economics...</div>
           </div>
-          <div className="absolute -left-32 top-[800px] -translate-y-1/2 font-bold text-lg text-purple-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow">
+          <div className="absolute top-[800px] -translate-y-1/2 font-bold text-lg text-purple-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow" style={{ left: bandLabelsLeft }}>
             Other
             <div className="text-xs font-normal mt-1 max-w-[120px] text-purple-600">Regions, Cities, Territories...</div>
           </div>

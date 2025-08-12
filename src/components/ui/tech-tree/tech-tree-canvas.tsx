@@ -106,6 +106,24 @@ export default function TechTreeCanvas({
         />
       </div>
 
+      {/* Fixed left-side Band Labels overlay aligned with vertical scroll/zoom */}
+      <div
+        className="absolute top-0 left-0 z-20 bg-transparent"
+        style={{
+          transform: `translate(0px, ${position.y}px) scale(${zoomLevel})`,
+          transformOrigin: "0 0",
+        }}
+      >
+        <TechTreeHeaders
+          collapsedCenturies={collapsedCenturies}
+          collapsedEras={collapsedEras}
+          onToggleEraCollapse={onToggleEraCollapse}
+          showBandLabels={true}
+          showEraBanner={false}
+          bandLabelsLeft={8}
+        />
+      </div>
+
       {/* SVG for connections */}
       <svg
         className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -130,13 +148,7 @@ export default function TechTreeCanvas({
           transformOrigin: "0 0",
         }}
       >
-        <TechTreeHeaders
-          collapsedCenturies={collapsedCenturies}
-          collapsedEras={collapsedEras}
-          onToggleEraCollapse={onToggleEraCollapse}
-          showBandLabels={true}
-          showEraBanner={false}
-        />
+        {/* Band labels moved to fixed-left overlay above */}
 
         <TechTreeNodes
           techNodes={techNodes}
