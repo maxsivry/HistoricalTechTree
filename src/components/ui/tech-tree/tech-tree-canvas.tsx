@@ -8,9 +8,10 @@ interface TechTreeCanvasProps {
   selectedFilterTags: string[]
   centuryPositions: Record<string, number>
   collapsedCenturies: string[]
+  collapsedEras: string[]
   position: { x: number; y: number }
   zoomLevel: number
-  onToggleCenturyCollapse: (centuryId: string) => void
+  onToggleEraCollapse: (eraId: string) => void
   onToggleExpansion: (nodeId: string) => void
   onOpenDetails: (node: TechNode) => void
   onToggleFilterTag: (tag: string) => void
@@ -23,9 +24,10 @@ export default function TechTreeCanvas({
   selectedFilterTags,
   centuryPositions,
   collapsedCenturies,
+  collapsedEras,
   position,
   zoomLevel,
-  onToggleCenturyCollapse,
+  onToggleEraCollapse,
   onToggleExpansion,
   onOpenDetails,
   onToggleFilterTag,
@@ -87,6 +89,23 @@ export default function TechTreeCanvas({
 
   return (
     <>
+      {/* Fixed Era Banner overlay at top of the timeline window */}
+      <div
+        className="absolute top-0 left-0 right-0 z-20 bg-transparent"
+        style={{
+          transform: `translate(${position.x}px, 0px) scale(${zoomLevel})`,
+          transformOrigin: "0 0",
+        }}
+      >
+        <TechTreeHeaders
+          collapsedCenturies={collapsedCenturies}
+          collapsedEras={collapsedEras}
+          onToggleEraCollapse={onToggleEraCollapse}
+          showBandLabels={false}
+          showEraBanner={true}
+        />
+      </div>
+
       {/* SVG for connections */}
       <svg
         className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -111,7 +130,13 @@ export default function TechTreeCanvas({
           transformOrigin: "0 0",
         }}
       >
-        <TechTreeHeaders collapsedCenturies={collapsedCenturies} onToggleCenturyCollapse={onToggleCenturyCollapse} />
+        <TechTreeHeaders
+          collapsedCenturies={collapsedCenturies}
+          collapsedEras={collapsedEras}
+          onToggleEraCollapse={onToggleEraCollapse}
+          showBandLabels={true}
+          showEraBanner={false}
+        />
 
         <TechTreeNodes
           techNodes={techNodes}

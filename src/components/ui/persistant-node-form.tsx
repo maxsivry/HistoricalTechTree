@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { DialogFooter } from "@/components/ui/dialog"
-import { MultiSelect } from "@/components/ui/multi-select"
 import { Badge } from "@/components/ui/badge"
-import { disciplineBands } from "@/constants/tech-tree-constants"
+import { disciplineBands, availableTags } from "@/constants/tech-tree-constants"
 import type { TechNode } from "@/lib/types/tech-tree"
 
 export type PersistantNodeFormData = Omit<TechNode, "year"> & { year: string | number }
@@ -41,7 +40,6 @@ export default function PersistantNodeForm({
   formData,
   yearType,
   errors,
-  categories,
   allNodes,
   links,
   people,
@@ -84,17 +82,34 @@ export default function PersistantNodeForm({
           <Textarea id="description" name="description" value={formData.description || ''} onChange={onInputChange} className="col-span-3" rows={4} />
         </div>
 
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label className="text-right">Categories</Label>
+        <div className="grid grid-cols-4 items-start gap-4">
+          <Label className="text-right mt-2">Tags</Label>
           <div className="col-span-3">
             <div className="mb-2">
-              <p className="text-sm text-muted-foreground mb-1">Select discipline categories:</p>
-              <MultiSelect
-                options={categories.map((cat) => ({ label: cat, value: cat }))}
-                selected={formData.category || []}
-                onChange={onCategoryChange}
-                placeholder="Select categories..."
-              />
+              <p className="text-sm text-muted-foreground mb-1">Select one or more tags:</p>
+              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                {availableTags.map((tag) => {
+                  const selected = (formData.category || []).includes(tag)
+                  return (
+                    <Button
+                      key={tag}
+                      variant={selected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        const current = new Set(formData.category || [])
+                        if (current.has(tag)) {
+                          current.delete(tag)
+                        } else {
+                          current.add(tag)
+                        }
+                        onCategoryChange(Array.from(current))
+                      }}
+                    >
+                      {tag}
+                    </Button>
+                  )
+                })}
+              </div>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-1">Discipline placement:</p>
@@ -112,15 +127,50 @@ export default function PersistantNodeForm({
           </div>
         </div>
 
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label className="text-right">Dependencies</Label>
+        <div className="grid grid-cols-4 items-start gap-4">
+          <Label className="text-right mt-2">Dependencies</Label>
           <div className="col-span-3">
-            <MultiSelect
-              options={allNodes.filter((n) => n.id !== formData.id).map((n) => ({ label: n.title, value: String(n.id) }))}
-              selected={formData.dependencies || []}
-              onChange={onDependenciesChange}
-              placeholder="Select dependencies..."
-            />
+            {(() => {
+              const rawYear = typeof formData.year === "number" ? formData.year : Number(formData.year || 0)
+              const finalYear = isNaN(rawYear) ? Number.NEGATIVE_INFINITY : (yearType === "BCE" ? -Math.abs(rawYear) : Math.abs(rawYear))
+              const pastNodes = allNodes
+                .filter((n) => n.id !== formData.id && typeof n.year === "number" && n.year < finalYear)
+                .sort((a, b) => a.year - b.year)
+
+              if (pastNodes.length === 0) {
+                return <p className="text-sm text-muted-foreground">No past events available</p>
+              }
+
+              const current = new Set(formData.dependencies || [])
+
+              const toggleDep = (id: string) => {
+                if (current.has(id)) {
+                  current.delete(id)
+                } else {
+                  current.add(id)
+                }
+                onDependenciesChange(Array.from(current))
+              }
+
+              return (
+                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                  {pastNodes.map((n) => {
+                    const id = String(n.id)
+                    const selected = current.has(id)
+                    return (
+                      <Button
+                        key={id}
+                        variant={selected ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleDep(id)}
+                      >
+                        {n.title}
+                      </Button>
+                    )
+                  })}
+                </div>
+              )
+            })()}
           </div>
         </div>
 
@@ -175,4 +225,3 @@ export default function PersistantNodeForm({
     </>
   )
 }
-

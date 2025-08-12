@@ -101,85 +101,84 @@ export const getNodePosition = (
   const yearPosition = (node.year - century.startYear) / (century.endYear - century.startYear)
   const left = centuryBasePosition + yearPosition * centuryWidth
 
-  // Determine which discipline band this node belongs to
-  let bandPosition = 400 // Default middle position if no match
-  let bandName = "Humanities" // Default band
+  // Determine which discipline band this node belongs to (default to Other)
+  let bandPosition = disciplineBands.Other.position
+  let bandName: keyof typeof disciplineBands = "Other"
 
-  // Check if any of the node's categories match our discipline bands
-  let matchFound = false
-  for (const [name, band] of Object.entries(disciplineBands)) {
-    for (const category of node.category) {
-      if (band.categories.includes(category)) {
-        bandPosition = band.position
-        bandName = name
-        matchFound = true
+  for (const [name, band] of Object.entries(disciplineBands) as [keyof typeof disciplineBands, (typeof disciplineBands)[keyof typeof disciplineBands]][]) {
+    if (node.category?.some((cat) => band.categories.includes(cat))) {
+      bandPosition = band.position
+      bandName = name
+      break
+    }
+  }
+
+  // Pixel-based unlimited-lane packing within the same band
+  const NODE_WIDTH = 300
+  const H_MARGIN = 12
+  const LANE_OFFSET = 160
+
+  // Collect visible nodes in the same band (skip nodes in collapsed centuries)
+  const bandNodes = allNodes.filter((n) => {
+    // Determine n's band
+    let nBand: keyof typeof disciplineBands = "Other"
+    for (const [name, band] of Object.entries(disciplineBands) as [keyof typeof disciplineBands, (typeof disciplineBands)[keyof typeof disciplineBands]][]) {
+      if (n.category?.some((cat) => band.categories.includes(cat))) {
+        nBand = name
         break
       }
     }
-    if (matchFound) break
+    const nCentury = getCenturyForYear(n.year)
+    if (!nCentury || collapsedCenturies.includes(nCentury.id)) return false
+    return nBand === bandName
+  })
+
+  // Precompute left positions for all band nodes
+  const leftById = new Map<string | number, number>()
+  for (const n of bandNodes) {
+    const c = getCenturyForYear(n.year)
+    if (!c) continue
+    const base = centuryPositions[c.id]
+    const centuryWidth = 1200
+    const yearPos = (n.year - c.startYear) / (c.endYear - c.startYear)
+    const lx = base + yearPos * centuryWidth
+    leftById.set(n.id, lx)
   }
 
-  // Find all nodes in the same year range and same band to avoid overlaps
-  const yearRange = 20 // Consider nodes within 20 years as potentially overlapping
-  const nodesInSameTimeAndBand = allNodes.filter(
-    (otherNode) =>
-      otherNode.id !== node.id &&
-      Math.abs(otherNode.year - node.year) <= yearRange &&
-      otherNode.category.some((cat) =>
-        disciplineBands[bandName as keyof typeof disciplineBands].categories.includes(cat),
-      ),
-  )
-
-  // Calculate vertical offset based on node's specific tags within the band
-  let tagOffset = 0
-  if (node.category.length > 0) {
-    // Get the first matching category for this band
-    const bandCategories = disciplineBands[bandName as keyof typeof disciplineBands].categories
-    const matchingCategories = node.category.filter((cat) => bandCategories.includes(cat))
-
-    if (matchingCategories.length > 0) {
-      // Use the index of the category within the band's categories to create an offset
-      const categoryIndex = bandCategories.indexOf(matchingCategories[0])
-      tagOffset = (categoryIndex % 5) * 15 // Spread nodes with different tags
-    }
-  }
-
-  // Add variation to prevent overlaps with nearby nodes
-  let verticalOffset = tagOffset
-
-  // Check for overlaps and adjust position if needed
-  let attempts = 0
-  const maxAttempts = 10
-  const nodeWidth = 300
-  const nodeHeight = 100
-
-  while (attempts < maxAttempts) {
-    const currentPosition = bandPosition + verticalOffset
-
-    // Check if this position overlaps with any existing node
-    const overlaps = nodesInSameTimeAndBand.some((otherNode) => {
-      const otherPos = getNodePositionSimple(otherNode, centuryPositions, collapsedCenturies)
-
-      // Check for horizontal overlap (within 280px)
-      const horizontalOverlap = Math.abs(left - otherPos.left) < nodeWidth - 20
-
-      // Check for vertical overlap (within 90px)
-      const verticalOverlap = Math.abs(currentPosition - otherPos.top) < nodeHeight - 10
-
-      return horizontalOverlap && verticalOverlap
+  // Sort by left, then id for stability
+  const sorted = bandNodes
+    .slice()
+    .sort((a, b) => {
+      const la = leftById.get(a.id) ?? 0
+      const lb = leftById.get(b.id) ?? 0
+      if (la === lb) return String(a.id).localeCompare(String(b.id))
+      return la - lb
     })
 
-    if (!overlaps) {
-      break // Position is good, no overlaps
+  // Greedy lane assignment
+  const laneEnds: number[] = [] // endX per lane
+  const laneOf = new Map<string | number, number>()
+  for (const n of sorted) {
+    const l = (leftById.get(n.id) ?? 0)
+    let placed = false
+    for (let i = 0; i < laneEnds.length; i++) {
+      if (l >= laneEnds[i] + H_MARGIN) {
+        laneOf.set(n.id, i)
+        laneEnds[i] = l + NODE_WIDTH
+        placed = true
+        break
+      }
     }
-
-    // Adjust vertical position to avoid overlap
-    verticalOffset += 40 // Move down by 40px
-    attempts++
+    if (!placed) {
+      laneOf.set(n.id, laneEnds.length)
+      laneEnds.push(l + NODE_WIDTH)
+    }
   }
+
+  const lane = laneOf.get(node.id) ?? 0
 
   return {
     left,
-    top: bandPosition + verticalOffset,
+    top: bandPosition + lane * LANE_OFFSET,
   }
 }

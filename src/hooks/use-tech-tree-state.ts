@@ -23,7 +23,7 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     const [addDialogOpen, setAddDialogOpen] = useState(false)
     const [selectedFilterTags, setSelectedFilterTags] = useState<string[]>([])
     const [isMounted, setIsMounted] = useState(false)
-    const [collapsedCenturies, setCollapsedCenturies] = useState<string[]>([])
+    const [collapsedEras, setCollapsedEras] = useState<string[]>([])
 
   // New development form state
   const [newDevelopment, setNewDevelopment] = useState<NewDevelopment>({
@@ -87,11 +87,9 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     setIsMounted(true)
   }, [])
 
-  // Toggle century collapse state
-  const toggleCenturyCollapse = (centuryId: string) => {
-    setCollapsedCenturies((prev) =>
-      prev.includes(centuryId) ? prev.filter((id) => id !== centuryId) : [...prev, centuryId],
-    )
+  // Toggle era collapse state
+  const toggleEraCollapse = (eraId: string) => {
+    setCollapsedEras((prev) => (prev.includes(eraId) ? prev.filter((id) => id !== eraId) : [...prev, eraId]))
   }
 
   // Toggle node expansion state
@@ -267,13 +265,13 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     setAddDialogOpen,
     selectedFilterTags,
     isMounted,
-    collapsedCenturies,
+    collapsedEras,
     newDevelopment,
     newLink,
     setNewLink,
 
     // Actions
-    toggleCenturyCollapse,
+    toggleEraCollapse,
     toggleNodeExpansion,
     openNodeDetails,
     toggleFilterTag,

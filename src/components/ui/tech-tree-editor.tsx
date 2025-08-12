@@ -51,11 +51,11 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
     setAddDialogOpen,
     selectedFilterTags,
     isMounted,
-    collapsedCenturies,
+    collapsedEras,
     newDevelopment,
     newLink,
     setNewLink,
-    toggleCenturyCollapse,
+    toggleEraCollapse,
     toggleNodeExpansion,
     openNodeDetails,
     toggleFilterTag,
@@ -182,11 +182,11 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
           setAddDialogOpen={setAddDialogOpen}
           selectedFilterTags={selectedFilterTags}
           isMounted={isMounted}
-          collapsedCenturies={collapsedCenturies}
+          collapsedEras={collapsedEras}
           newDevelopment={newDevelopment}
           newLink={newLink}
           setNewLink={setNewLink}
-          toggleCenturyCollapse={toggleCenturyCollapse}
+          toggleEraCollapse={toggleEraCollapse}
           toggleNodeExpansion={toggleNodeExpansion}
           openNodeDetails={openNodeDetails}
           toggleFilterTag={toggleFilterTag}

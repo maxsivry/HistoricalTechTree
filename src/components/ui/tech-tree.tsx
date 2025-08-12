@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { NewDevelopment, TechNode } from "@/lib/types/tech-tree"
 import { calculateCenturyPositions } from "@/utils/tech-tree-utils"
+import { eras, centuries } from "@/constants/tech-tree-constants"
 import { useTechTreeInteractions } from "@/hooks/use-tech-tree-interactions"
 import TechTreeControls from "@/components/ui/tech-tree/tech-tree-controls"
 import TechTreeCanvas from "@/components/ui/tech-tree/tech-tree-canvas"
@@ -26,11 +27,11 @@ interface TechTreeProps {
   setAddDialogOpen: (open: boolean) => void
   selectedFilterTags: string[]
   isMounted: boolean
-  collapsedCenturies: string[]
+  collapsedEras: string[]
   newDevelopment: NewDevelopment // You can use a more specific type here
   newLink: { title: string; url: string }
   setNewLink: (link: { title: string; url: string }) => void
-  toggleCenturyCollapse: (centuryId: string) => void
+  toggleEraCollapse: (eraId: string) => void
   toggleNodeExpansion: (nodeId: string) => void
   openNodeDetails: (node: TechNode) => void
   toggleFilterTag: (tag: string) => void
@@ -57,11 +58,11 @@ export default function TechTree({
   setAddDialogOpen,
   selectedFilterTags,
   isMounted,
-  collapsedCenturies,
+  collapsedEras,
   newDevelopment,
   newLink,
   setNewLink,
-  toggleCenturyCollapse,
+  toggleEraCollapse,
   toggleNodeExpansion,
   openNodeDetails,
   toggleFilterTag,
@@ -87,10 +88,23 @@ export default function TechTree({
   } = useTechTreeInteractions()
 
 
-  // Calculate century positions based on which ones are collapsed
-  const centuryPositions = useMemo(() => {
-    return calculateCenturyPositions(collapsedCenturies)
-  }, [collapsedCenturies])
+  // Derive collapsed centuries from collapsed eras and compute positions
+  const { collapsedCenturies, centuryPositions } = useMemo(() => {
+    const collapsedCenturyIds: string[] = []
+    for (const era of eras) {
+      if (collapsedEras.includes(era.id)) {
+        for (const c of centuries) {
+          if (c.startYear >= era.startYear && c.endYear <= era.endYear) {
+            collapsedCenturyIds.push(c.id)
+          }
+        }
+      }
+    }
+    return {
+      collapsedCenturies: collapsedCenturyIds,
+      centuryPositions: calculateCenturyPositions(collapsedCenturyIds),
+    }
+  }, [collapsedEras])
 
   // If not mounted yet, return a loading state or nothing
   if (!isMounted) {
@@ -128,9 +142,10 @@ export default function TechTree({
           selectedFilterTags={selectedFilterTags}
           centuryPositions={centuryPositions}
           collapsedCenturies={collapsedCenturies}
+          collapsedEras={collapsedEras}
           position={position}
           zoomLevel={zoomLevel}
-          onToggleCenturyCollapse={toggleCenturyCollapse}
+          onToggleEraCollapse={toggleEraCollapse}
           onToggleExpansion={toggleNodeExpansion}
           onOpenDetails={openNodeDetails}
           onToggleFilterTag={toggleFilterTag}
