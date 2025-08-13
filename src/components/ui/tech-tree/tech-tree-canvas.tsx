@@ -39,7 +39,7 @@ export default function TechTreeCanvas({
     // Get filtered nodes
     const filteredNodes =
       selectedFilterTags.length > 0
-        ? techNodes.filter((node) => selectedFilterTags.every((tag) => node.category.includes(tag)))
+        ? techNodes.filter((node) => selectedFilterTags.every((tag) => (node.category || []).includes(tag)))
         : techNodes
 
     return filteredNodes
@@ -50,7 +50,7 @@ export default function TechTreeCanvas({
           return null
         }
 
-        return node.dependencies.map((depId) => {
+        return (node.dependencies || []).map((depId) => {
           const depNode = techNodes.find((n) => n.id === depId)
           if (!depNode) return null
 
@@ -62,7 +62,7 @@ export default function TechTreeCanvas({
 
           // Only show connections if both nodes are visible in the current filter
           const isDepNodeVisible =
-            selectedFilterTags.length === 0 || selectedFilterTags.every((tag) => depNode.category.includes(tag))
+            selectedFilterTags.length === 0 || selectedFilterTags.every((tag) => (depNode.category || []).includes(tag))
 
           if (!isDepNodeVisible) return null
 

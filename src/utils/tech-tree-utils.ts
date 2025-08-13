@@ -59,7 +59,7 @@ export const getNodePositionSimple = (
 
   // Check if any of the node's categories match our discipline bands
   for (const [, band] of Object.entries(disciplineBands)) {
-    for (const category of node.category) {
+    for (const category of (node.category || [])) {
       if (band.categories.includes(category)) {
         bandPosition = band.position
         break
@@ -69,7 +69,9 @@ export const getNodePositionSimple = (
 
 
   // Use node ID to create a consistent offset
-  const idSum = node.id.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  const idSum = String(node.id)
+    .split("")
+    .reduce((sum: number, char: string) => sum + char.charCodeAt(0), 0)
   const verticalOffset = (idSum % 5) * 20
 
   return {
