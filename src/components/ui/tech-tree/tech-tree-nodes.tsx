@@ -31,14 +31,18 @@ export default function TechTreeNodes({
 }: TechTreeNodesProps) {
   // Filter nodes based on selected tags
   const filteredNodes = techNodes.filter(
-    (node) => selectedFilterTags.length === 0 || selectedFilterTags.every((tag) => node.category.includes(tag)),
+    (node) =>
+      selectedFilterTags.length === 0 ||
+      selectedFilterTags.every((tag) => (node.category || []).includes(tag)),
   )
 
   // Check if we should show empty state
   const showEmptyState =
     techNodes.length === 0 ||
     (selectedFilterTags.length > 0 &&
-      !techNodes.some((node) => selectedFilterTags.every((tag) => node.category.includes(tag))))
+      !techNodes.some((node) =>
+        selectedFilterTags.every((tag) => (node.category || []).includes(tag)),
+      ))
 
   return (
     <>
