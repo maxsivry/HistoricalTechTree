@@ -32,7 +32,7 @@ interface TechTreeProps {
   newLink: { title: string; url: string }
   setNewLink: (link: { title: string; url: string }) => void
   toggleEraCollapse: (eraId: string) => void
-  toggleNodeExpansion: (nodeId: string) => void
+  toggleNodeExpansion: (nodeId: string | number) => void
   openNodeDetails: (node: TechNode) => void
   toggleFilterTag: (tag: string) => void
   clearFilters: () => void
@@ -169,7 +169,7 @@ export default function TechTree({
               <Tabs defaultValue="overview">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="connections">Connections</TabsTrigger>
+                  <TabsTrigger value="dependencies">Dependencies</TabsTrigger>
                   <TabsTrigger value="resources">Resources</TabsTrigger>
                 </TabsList>
 
@@ -194,16 +194,16 @@ export default function TechTree({
                   )}
                 </TabsContent>
 
-                <TabsContent value="connections">
+                <TabsContent value="dependencies">
                   {selectedNode.dependencies && selectedNode.dependencies.length > 0 ? (
                     <ul className="list-disc pl-5">
                       {selectedNode.dependencies.map((depId) => {
-                        const depNode = nodes.find((node) => node.id === depId)
-                        return depNode ? <li key={depId}>{depNode.title}</li> : null
+                        const depNode = nodes.find((node) => String(node.id) === String(depId))
+                        return depNode ? <li key={String(depId)}>{depNode.title}</li> : null
                       })}
                     </ul>
                   ) : (
-                    <p>No known connections.</p>
+                    <p>No dependencies.</p>
                   )}
                 </TabsContent>
 
@@ -235,7 +235,7 @@ export default function TechTree({
                     Edit Persistent Development
                   </Button>
                   <Button variant="destructive" onClick={() => onDeleteNode(String(selectedNode.id))} className="mt-2">
-                    Delete Persistent Development
+                     Delete Development From Database
                   </Button>
                 </>
               )}

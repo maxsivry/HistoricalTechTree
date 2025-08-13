@@ -11,7 +11,7 @@ interface TechTreeNodeProps {
   node: TechNode
   position: { left: number; top: number }
   selectedFilterTags: string[]
-  onToggleExpansion: (nodeId: string) => void
+  onToggleExpansion: (nodeId: string | number) => void
   onOpenDetails: (node: TechNode) => void
   onToggleFilterTag: (tag: string) => void
 }
@@ -54,7 +54,7 @@ export default function TechTreeNode({
       </div>
 
       <div className="flex flex-wrap gap-1 mb-2">
-        {node.category.map((cat) => (
+        {(node.category || []).map((cat) => (
           <Badge
             key={cat}
             variant={selectedFilterTags.includes(cat) ? "default" : "secondary"}

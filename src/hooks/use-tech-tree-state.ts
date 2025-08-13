@@ -93,18 +93,11 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
   }
 
   // Toggle node expansion state
-  // Toggle node expansion state
-  const toggleNodeExpansion = (nodeId: string) => {
-    // Check if it's a session node by its ID prefix
-    if (nodeId.startsWith("session-")) {
-      setSessionNodes((prev) =>
-        prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)),
-      )
+  const toggleNodeExpansion = (nodeId: string | number) => {
+    if (typeof nodeId === "string" && nodeId.startsWith("session-")) {
+      setSessionNodes((prev) => prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)))
     } else {
-      // Otherwise, it's a persistent node
-      setPersistentNodes((prev) =>
-        prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)),
-      )
+      setPersistentNodes((prev) => prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)))
     }
   }
 

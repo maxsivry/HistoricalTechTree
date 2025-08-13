@@ -2,12 +2,11 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { validateTitle, validateYear } from "@/lib/validate";
 import type { TechNode } from "@/lib/types/tech-tree";
 import PersistantNodeForm from "@/components/ui/persistant-node-form"
-import { Button } from "./button";
 
 interface NodeEditorProps {
   open: boolean
@@ -22,7 +21,7 @@ interface NodeEditorProps {
 
 type NodeFormData = Omit<TechNode, "year"> & { year: string | number }
 
-export default function NodeEditor({ open, onOpenChange, node, onSave, onDelete, allNodes, categories, eras }: NodeEditorProps) {
+export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes, categories, eras }: NodeEditorProps) {
   const isNewNode = !node?.id
 
   const [formData, setFormData] = useState<NodeFormData>(
@@ -48,6 +47,45 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, onDelete,
   const [newLink, setNewLink] = useState({ title: "", url: "" })
   const [newPerson, setNewPerson] = useState("")
   const [errors, setErrors] = useState<{ title?: string; year?: string }>({});
+
+  // Prefill form when opening editor or when selected node changes
+  useEffect(() => {
+    if (!open) return;
+    if (node) {
+      const y = typeof node.year === "number" ? node.year : Number(node.year)
+      const isBce = !isNaN(y) && y < 0
+      setYearType(isBce ? "BCE" : "CE")
+      setFormData({
+        ...node,
+        year: isNaN(y) ? "" : Math.abs(y),
+      })
+      setLinks(node.links || [])
+      setPeople(node.people || [])
+      setNewLink({ title: "", url: "" })
+      setNewPerson("")
+      setErrors({})
+    } else {
+      // Reset for creating a new node
+      setYearType("CE")
+      setFormData({
+        id: "",
+        title: "",
+        year: "",
+        description: "",
+        category: [],
+        era: "",
+        century: "",
+        dependencies: [],
+        links: [],
+        people: [],
+      })
+      setLinks([])
+      setPeople([])
+      setNewLink({ title: "", url: "" })
+      setNewPerson("")
+      setErrors({})
+    }
+  }, [open, node])
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -202,21 +240,6 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, onDelete,
           onSave={handleSave}
         />
 
-        {!isNewNode && (
-          <div className="flex justify-end mt-2">
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (node?.id && onDelete) {
-                  onDelete(node.id)
-                }
-                onOpenChange(false)
-              }}
-            >
-              Delete Persistent Development
-            </Button>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   )

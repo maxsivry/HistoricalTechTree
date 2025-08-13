@@ -12,7 +12,7 @@ interface TechTreeCanvasProps {
   position: { x: number; y: number }
   zoomLevel: number
   onToggleEraCollapse: (eraId: string) => void
-  onToggleExpansion: (nodeId: string) => void
+  onToggleExpansion: (nodeId: string | number) => void
   onOpenDetails: (node: TechNode) => void
   onToggleFilterTag: (tag: string) => void
   onAddDevelopment: () => void
