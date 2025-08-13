@@ -23,7 +23,7 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     const [addDialogOpen, setAddDialogOpen] = useState(false)
     const [selectedFilterTags, setSelectedFilterTags] = useState<string[]>([])
     const [isMounted, setIsMounted] = useState(false)
-    const [collapsedCenturies, setCollapsedCenturies] = useState<string[]>([])
+    const [collapsedEras, setCollapsedEras] = useState<string[]>([])
 
   // New development form state
   const [newDevelopment, setNewDevelopment] = useState<NewDevelopment>({
@@ -68,8 +68,8 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
                 let updated = currentNodes.filter((node) => node.id !== deletedNodeId);
                 updated = updated.map(node => ({
                     ...node,
-                    dependencies: node.dependencies.filter(dep => dep !== deletedNodeId)
-                }));
+                    dependencies: node.dependencies?.filter(dep => dep !== deletedNodeId) ?? []
+                  }));
                 return updated;
             });
           }
@@ -87,26 +87,17 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     setIsMounted(true)
   }, [])
 
-  // Toggle century collapse state
-  const toggleCenturyCollapse = (centuryId: string) => {
-    setCollapsedCenturies((prev) =>
-      prev.includes(centuryId) ? prev.filter((id) => id !== centuryId) : [...prev, centuryId],
-    )
+  // Toggle era collapse state
+  const toggleEraCollapse = (eraId: string) => {
+    setCollapsedEras((prev) => (prev.includes(eraId) ? prev.filter((id) => id !== eraId) : [...prev, eraId]))
   }
 
   // Toggle node expansion state
-  // Toggle node expansion state
-  const toggleNodeExpansion = (nodeId: string) => {
-    // Check if it's a session node by its ID prefix
-    if (nodeId.startsWith("session-")) {
-      setSessionNodes((prev) =>
-        prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)),
-      )
+  const toggleNodeExpansion = (nodeId: string | number) => {
+    if (typeof nodeId === "string" && nodeId.startsWith("session-")) {
+      setSessionNodes((prev) => prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)))
     } else {
-      // Otherwise, it's a persistent node
-      setPersistentNodes((prev) =>
-        prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)),
-      )
+      setPersistentNodes((prev) => prev.map((n) => (n.id === nodeId ? { ...n, expanded: !n.expanded } : n)))
     }
   }
 
@@ -137,17 +128,27 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     const { name, value } = e.target
     setNewDevelopment((prev) => ({
       ...prev,
-      [name]: name === "year" ? Math.abs(Number.parseInt(value) || 0) : value,
+      [name]: name === "year" ? (value === "" ? "" : Number(value)) : value,
     }))
   }
 
   // Handle year type change
   const handleYearTypeChange = (type: "BCE" | "CE") => {
-    setNewDevelopment((prev) => ({
-      ...prev,
-      yearType: type,
-    }))
-  }
+    setNewDevelopment(prev => {
+      const currentYear = Number(prev.year);
+      if (isNaN(currentYear)) {
+        return { ...prev, yearType: type };
+      }
+      
+      const year = type === "BCE" ? -Math.abs(currentYear) : Math.abs(currentYear);
+      
+      return {
+        ...prev,
+        yearType: type,
+        year: year,
+      };
+    });
+  };
 
   // Handle dependency selection
   const handleDependencyToggle = (nodeId: string) => {
@@ -257,13 +258,13 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     setAddDialogOpen,
     selectedFilterTags,
     isMounted,
-    collapsedCenturies,
+    collapsedEras,
     newDevelopment,
     newLink,
     setNewLink,
 
     // Actions
-    toggleCenturyCollapse,
+    toggleEraCollapse,
     toggleNodeExpansion,
     openNodeDetails,
     toggleFilterTag,

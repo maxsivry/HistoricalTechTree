@@ -11,7 +11,7 @@ interface TechTreeNodesProps {
   selectedFilterTags: string[]
   centuryPositions: Record<string, number>
   collapsedCenturies: string[]
-  onToggleExpansion: (nodeId: string) => void
+  onToggleExpansion: (nodeId: string | number) => void
   onOpenDetails: (node: TechNode) => void
   onToggleFilterTag: (tag: string) => void
   onAddDevelopment: () => void
