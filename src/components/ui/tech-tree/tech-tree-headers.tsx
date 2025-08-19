@@ -50,7 +50,7 @@ export default function TechTreeHeaders({ collapsedCenturies, collapsedEras, onT
             const MIN_EXPANDED_WIDTH = 600
             const width = isCollapsed
               ? 60
-              : Math.max(visiblePeriods.length * 1200, visiblePeriods.length === 0 ? MIN_EXPANDED_WIDTH : 0)
+              : Math.max(visiblePeriods.length * 2400, visiblePeriods.length === 0 ? MIN_EXPANDED_WIDTH : 0)
 
             return (
               <div

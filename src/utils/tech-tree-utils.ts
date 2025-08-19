@@ -25,7 +25,7 @@ export const calculateCenturyPositions = (collapsedCenturies: string[]) => {
   for (const century of centuries) {
     positions[century.id] = currentPosition
     if (!collapsedCenturies.includes(century.id)) {
-      currentPosition += 1200 // Each period is 1200px wide
+      currentPosition += 2400 // Each period is 2400px wide
     }
   }
 
@@ -50,7 +50,7 @@ export const getNodePositionSimple = (
   }
 
   // Calculate horizontal position based on year within century
-  const centuryWidth = 1200 // Width allocated for each century
+  const centuryWidth = 2400 // Width allocated for each century
   const yearPosition = (node.year - century.startYear) / (century.endYear - century.startYear)
   const left = centuryBasePosition + yearPosition * centuryWidth
 
@@ -99,56 +99,37 @@ export const getNodePosition = (
   }
 
   // Calculate horizontal position based on year within century
-  const centuryWidth = 1200 // Width allocated for each century
+  const centuryWidth = 2400 // Width allocated for each century
   const yearPosition = (node.year - century.startYear) / (century.endYear - century.startYear)
   const left = centuryBasePosition + yearPosition * centuryWidth
 
-  // Determine which discipline band this node belongs to (default to Other)
-  let bandPosition = disciplineBands.Other.position
-  let bandName: keyof typeof disciplineBands = "Other"
-
-  for (const [name, band] of Object.entries(disciplineBands) as [keyof typeof disciplineBands, (typeof disciplineBands)[keyof typeof disciplineBands]][]) {
-    if (node.category?.some((cat) => band.categories.includes(cat))) {
-      bandPosition = band.position
-      bandName = name
-      break
-    }
-  }
-
-  // Pixel-based unlimited-lane packing within the same band
+  // Global lane packing starting from a single baseline (no band separation)
   const NODE_WIDTH = 300
   const H_MARGIN = 12
-  const LANE_OFFSET = 160
+  const LANE_OFFSET = 120
+  const BASELINE_TOP = 120 // pixels
 
-  // Collect visible nodes in the same band (skip nodes in collapsed centuries)
-  const bandNodes = allNodes.filter((n) => {
-    // Determine n's band
-    let nBand: keyof typeof disciplineBands = "Other"
-    for (const [name, band] of Object.entries(disciplineBands) as [keyof typeof disciplineBands, (typeof disciplineBands)[keyof typeof disciplineBands]][]) {
-      if (n.category?.some((cat) => band.categories.includes(cat))) {
-        nBand = name
-        break
-      }
-    }
+  // Collect all visible nodes (skip nodes in collapsed centuries)
+  const visibleNodes = allNodes.filter((n) => {
     const nCentury = getCenturyForYear(n.year)
     if (!nCentury || collapsedCenturies.includes(nCentury.id)) return false
-    return nBand === bandName
+    return true
   })
 
-  // Precompute left positions for all band nodes
+  // Precompute left positions for all visible nodes
   const leftById = new Map<string | number, number>()
-  for (const n of bandNodes) {
+  for (const n of visibleNodes) {
     const c = getCenturyForYear(n.year)
     if (!c) continue
     const base = centuryPositions[c.id]
-    const centuryWidth = 1200
+    const centuryWidth = 2400
     const yearPos = (n.year - c.startYear) / (c.endYear - c.startYear)
     const lx = base + yearPos * centuryWidth
     leftById.set(n.id, lx)
   }
 
   // Sort by left, then id for stability
-  const sorted = bandNodes
+  const sorted = visibleNodes
     .slice()
     .sort((a, b) => {
       const la = leftById.get(a.id) ?? 0
@@ -181,6 +162,6 @@ export const getNodePosition = (
 
   return {
     left,
-    top: bandPosition + lane * LANE_OFFSET,
+    top: BASELINE_TOP + lane * LANE_OFFSET,
   }
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -58,6 +59,7 @@ export default function PersistantNodeForm({
   onCancel,
   onSave,
 }: PersistantNodeFormProps) {
+  const [depQuery, setDepQuery] = useState("")
   return (
     <>
       <div className="grid gap-4 py-4">
@@ -142,6 +144,9 @@ export default function PersistantNodeForm({
               }
 
               const current = new Set(formData.dependencies || [])
+              const filtered = depQuery
+                ? pastNodes.filter((n) => n.title.toLowerCase().includes(depQuery.toLowerCase()))
+                : []
 
               const toggleDep = (id: string) => {
                 if (current.has(id)) {
@@ -153,21 +158,53 @@ export default function PersistantNodeForm({
               }
 
               return (
-                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                  {pastNodes.map((n) => {
-                    const id = String(n.id)
-                    const selected = current.has(id)
-                    return (
-                      <Button
-                        key={id}
-                        variant={selected ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleDep(id)}
-                      >
-                        {n.title}
-                      </Button>
+                <div className="space-y-2">
+                  {/* Selected dependencies */}
+                  {current.size > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {Array.from(current).map((id) => {
+                        const n = pastNodes.find((p) => String(p.id) === String(id))
+                        if (!n) return null
+                        return (
+                          <Badge key={id} variant="secondary" className="flex items-center gap-1">
+                            {n.title}
+                            <button onClick={() => toggleDep(String(id))} className="ml-1 hover:text-destructive">×</button>
+                          </Badge>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {/* Search input */}
+                  <Input
+                    placeholder="Search dependencies by title..."
+                    value={depQuery}
+                    onChange={(e) => setDepQuery(e.target.value)}
+                  />
+
+                  {/* Results */}
+                  {depQuery && (
+                    filtered.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                        {filtered.map((n) => {
+                          const id = String(n.id)
+                          const selected = current.has(id)
+                          return (
+                            <Button
+                              key={id}
+                              variant={selected ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => toggleDep(id)}
+                            >
+                              {n.title}
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No dependency found</p>
                     )
-                  })}
+                  )}
                 </div>
               )
             })()}

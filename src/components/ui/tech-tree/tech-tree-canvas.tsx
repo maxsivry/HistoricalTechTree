@@ -34,6 +34,19 @@ export default function TechTreeCanvas({
   onAddDevelopment,
   onClearFilters,
 }: TechTreeCanvasProps) {
+  // Compute an offset so the Ancient era starts at the left edge by default.
+  // This shifts the era banner left by the width of the Prehistoric banner,
+  // keeping the node canvas aligned to Ancient at x=0.
+  const prehistoricWidth = (() => {
+    // Mirror logic from TechTreeHeaders to derive Prehistoric banner width.
+    const MIN_EXPANDED_WIDTH = 600
+    const PREHISTORIC_ID = "prehistoric"
+    const isCollapsed = collapsedEras.includes(PREHISTORIC_ID)
+    // Prehistoric overlaps no defined periods in our current setup, so this remains 0.
+    const overlappingPeriods = 0
+    if (isCollapsed) return 60
+    return Math.max(overlappingPeriods * 2400, overlappingPeriods === 0 ? MIN_EXPANDED_WIDTH : 0)
+  })()
   // Render connections between nodes
   const renderConnections = () => {
     // Get filtered nodes
@@ -93,7 +106,7 @@ export default function TechTreeCanvas({
       <div
         className="absolute top-0 left-0 right-0 z-20 bg-transparent"
         style={{
-          transform: `translate(${position.x}px, 0px) scale(${zoomLevel})`,
+          transform: `translate(${position.x - prehistoricWidth}px, 0px) scale(${zoomLevel})`,
           transformOrigin: "0 0",
         }}
       >
@@ -106,23 +119,7 @@ export default function TechTreeCanvas({
         />
       </div>
 
-      {/* Fixed left-side Band Labels overlay aligned with vertical scroll/zoom */}
-      <div
-        className="absolute top-0 left-0 z-20 bg-transparent"
-        style={{
-          transform: `translate(0px, ${position.y}px) scale(${zoomLevel})`,
-          transformOrigin: "0 0",
-        }}
-      >
-        <TechTreeHeaders
-          collapsedCenturies={collapsedCenturies}
-          collapsedEras={collapsedEras}
-          onToggleEraCollapse={onToggleEraCollapse}
-          showBandLabels={true}
-          showEraBanner={false}
-          bandLabelsLeft={8}
-        />
-      </div>
+      {/* Band Labels removed as per new uniform baseline design */}
 
       {/* SVG for connections */}
       <svg

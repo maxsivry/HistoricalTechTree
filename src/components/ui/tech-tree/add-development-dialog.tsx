@@ -1,6 +1,8 @@
 "use client"
+import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { X } from "lucide-react"
 import type { NewDevelopment, TechNode } from "@/lib/types/tech-tree"
 import { availableTags } from "@/constants/tech-tree-constants"
@@ -36,6 +38,7 @@ export default function AddDevelopmentDialog({
   removeLink,
   onSave,
 }: AddDevelopmentDialogProps) {
+  const [depQuery, setDepQuery] = useState("")
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -114,17 +117,52 @@ export default function AddDevelopmentDialog({
 
           <div className="grid grid-cols-4 items-start gap-4">
             <label className="text-right mt-2">Dependencies</label>
-            <div className="col-span-3 flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-              {nodes.map((node) => (
-                <Button
-                  key={node.id}
-                  variant={newDevelopment.dependencies.includes(String(node.id)) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleDependencyToggle(String(node.id))}
-                >
-                  {node.title}
-                </Button>
-              ))}
+            <div className="col-span-3 space-y-2">
+              {/* Selected dependencies */}
+              {newDevelopment.dependencies.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {newDevelopment.dependencies.map((id) => {
+                    const n = nodes.find((p) => String(p.id) === String(id))
+                    if (!n) return null
+                    return (
+                      <Button key={id} variant="secondary" size="sm" onClick={() => handleDependencyToggle(String(id))}>
+                        {n.title} <span className="ml-1">×</span>
+                      </Button>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Search input */}
+              <div className="space-y-2">
+                <Input
+                  placeholder="Search dependencies by title..."
+                  value={depQuery}
+                  onChange={(e) => setDepQuery(e.target.value)}
+                />
+                {(() => {
+                  const filtered = depQuery
+                    ? nodes.filter((n) => n.title.toLowerCase().includes(depQuery.toLowerCase()))
+                    : []
+                  if (!depQuery) return null
+                  return filtered.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                      {filtered.map((n) => (
+                        <Button
+                          key={n.id}
+                          variant={newDevelopment.dependencies.includes(String(n.id)) ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleDependencyToggle(String(n.id))}
+                        >
+                          {n.title}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No dependency found</p>
+                  )
+                })()}
+              </div>
             </div>
           </div>
         </div>
@@ -137,4 +175,3 @@ export default function AddDevelopmentDialog({
     </Dialog>
   )
 }
-

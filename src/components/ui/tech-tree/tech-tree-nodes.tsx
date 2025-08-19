@@ -46,8 +46,8 @@ export default function TechTreeNodes({
 
   return (
     <>
-      {/* Empty state message */}
-      {showEmptyState && (
+      {/* Empty state message disabled per request */}
+      {false && showEmptyState && (
         <div className="absolute top-[400px] left-[50%] -translate-x-1/2 text-center p-8 bg-white dark:bg-slate-800 rounded-lg shadow-md border-2 border-dashed border-slate-300 dark:border-slate-600">
           <h3 className="text-xl font-bold mb-2">
             {techNodes.length === 0 ? "No Historical Developments yet" : "No matching developments found"}
