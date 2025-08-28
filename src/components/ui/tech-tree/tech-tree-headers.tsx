@@ -30,10 +30,7 @@ export default function TechTreeHeaders({ collapsedCenturies, collapsedEras, onT
             Social Studies
             <div className="text-xs font-normal mt-1 max-w-[120px] text-amber-600">History, Politics, Economics...</div>
           </div>
-          <div className="absolute top-[800px] -translate-y-1/2 font-bold text-lg text-purple-700 z-10 bg-white dark:bg-slate-800 p-2 rounded shadow" style={{ left: bandLabelsLeft }}>
-            Other
-            <div className="text-xs font-normal mt-1 max-w-[120px] text-purple-600">Regions, Cities, Territories...</div>
-          </div>
+          {/* Removed 'Other' band label per requirements */}
         </>
       )}
 

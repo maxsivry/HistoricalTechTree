@@ -65,21 +65,7 @@ export const disciplineBands: DisciplineBands = {
   //   position: 800,
   //   color: "purple",
   // },
-  Other: {
-    categories: [
-      "Natural Philospher",
-      "Doctor",
-      "Geometer/Astronomy",
-      "Merchant",
-      "Politician",
-      "Kyrios",
-      "Dramatist",
-      "Philosopher",
-    ], 
-    position: 800,
-    color: "purple",
-
-  }
+  
 }
 
 // Available tags for developments
@@ -87,5 +73,4 @@ export const availableTags = [
   ...disciplineBands.STEM.categories,
   ...disciplineBands.Humanities.categories,
   ...disciplineBands["Social Studies"].categories,
-  ...disciplineBands.Other.categories,
 ]
