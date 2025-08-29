@@ -2,14 +2,20 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import { loadJSON, saveJSON } from "@/utils/storage"
 
 export const useTechTreeInteractions = () => {
-  const [zoomLevel, setZoomLevel] = useState(0.5)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const storedViewport = loadJSON<{ zoom: number; position: { x: number; y: number } }>("viewport", {
+    zoom: 0.5,
+    position: { x: 0, y: 0 },
+  })
+  const [zoomLevel, setZoomLevel] = useState(storedViewport.zoom ?? 0.5)
+  const [position, setPosition] = useState(storedViewport.position ?? { x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const [startDragPosition, setStartDragPosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
+  const persistTimer = useRef<number | null>(null)
 
   // Handle zoom in/out
   const handleZoom = (direction: "in" | "out") => {
@@ -70,6 +76,17 @@ export const useTechTreeInteractions = () => {
     setZoomLevel(newZoomLevel)
     setPosition({ x: newPositionX, y: newPositionY })
   }
+
+  // Persist viewport (debounced) when zoom/position change
+  useEffect(() => {
+    if (persistTimer.current) window.clearTimeout(persistTimer.current)
+    persistTimer.current = window.setTimeout(() => {
+      saveJSON("viewport", { zoom: zoomLevel, position })
+    }, 250)
+    return () => {
+      if (persistTimer.current) window.clearTimeout(persistTimer.current)
+    }
+  }, [zoomLevel, position])
 
   return {
     zoomLevel,

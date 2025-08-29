@@ -2,10 +2,11 @@
 
 import type React from "react"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import type { TechNode, NewDevelopment } from "@/lib/types/tech-tree"
 import { getEraForYear, getCenturyForYear } from "@/utils/tech-tree-utils"
 import { supabase } from "@/lib/supabaseClient" 
+import { loadJSON, saveJSON } from "@/utils/storage"
 
 
 export const useTechTreeState = (initialNodes: TechNode[] = []) => {
@@ -24,6 +25,7 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
     const [selectedFilterTags, setSelectedFilterTags] = useState<string[]>([])
     const [isMounted, setIsMounted] = useState(false)
     const [collapsedEras, setCollapsedEras] = useState<string[]>([])
+    const firstLoadDone = useRef(false)
 
   // New development form state
   const [newDevelopment, setNewDevelopment] = useState<NewDevelopment>({
@@ -84,8 +86,26 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
 
   // Set isMounted to true after component mounts
   useEffect(() => {
+    // Load persisted UI state once on mount
+    const storedCollapsed = loadJSON<string[]>("collapsedEras", [])
+    const storedFilters = loadJSON<string[]>("selectedFilters", [])
+    if (storedCollapsed.length) setCollapsedEras(storedCollapsed)
+    if (storedFilters.length) setSelectedFilterTags(storedFilters)
+    firstLoadDone.current = true
     setIsMounted(true)
   }, [])
+
+  // Persist collapsed eras when they change
+  useEffect(() => {
+    if (!firstLoadDone.current) return
+    saveJSON("collapsedEras", collapsedEras)
+  }, [collapsedEras])
+
+  // Persist selected filter tags when they change
+  useEffect(() => {
+    if (!firstLoadDone.current) return
+    saveJSON("selectedFilters", selectedFilterTags)
+  }, [selectedFilterTags])
 
   // Toggle era collapse state
   const toggleEraCollapse = (eraId: string) => {
