@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { X } from "lucide-react"
 import type { NewDevelopment, TechNode } from "@/lib/types/tech-tree"
+import { toExternalHref } from "@/utils/url"
 import { availableTags } from "@/constants/tech-tree-constants"
 
 interface AddDevelopmentDialogProps {
@@ -87,7 +88,7 @@ export default function AddDevelopmentDialog({
             <div className="col-span-3">
               {newDevelopment.links.map((link, index) => (
                 <div key={index} className="flex items-center mb-2">
-                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex-1 truncate">
+                  <a href={toExternalHref(link.url)} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex-1 truncate">
                     {link.title || link.url}
                   </a>
                   <Button variant="ghost" size="icon" className="ml-2 h-6 w-6" onClick={() => removeLink(index)}>
