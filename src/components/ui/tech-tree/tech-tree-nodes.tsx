@@ -19,6 +19,22 @@ interface TechTreeNodesProps {
   onClearFilters: () => void
 }
 
+/**
+ * Renders a set of historical development nodes (the tech tree), applying tag filters and collapsed-era/century visibility.
+ *
+ * Filters nodes by `selectedFilterTags` (a node must include all selected tags to remain). Nodes whose era id appears in `collapsedEras` or whose century id appears in `collapsedCenturies` are omitted. Node positions are computed using `centuryPositions` and `collapsedCenturies`. An empty-state UI is present in the code but currently disabled.
+ *
+ * @param selectedFilterTags - Active tag filters; a node is included only if it contains every tag in this array.
+ * @param centuryPositions - Mapping of century identifiers to horizontal positions; used to compute each node's layout position.
+ * @param collapsedCenturies - List of century ids that should be hidden (nodes in those centuries are not rendered).
+ * @param collapsedEras - List of era ids that should be hidden (nodes in those eras are not rendered).
+ * @param onToggleExpansion - Callback invoked with a node id to toggle that node's expanded/collapsed state.
+ * @param onOpenDetails - Callback invoked with a node to open its detail view.
+ * @param onToggleFilterTag - Callback invoked with a tag to toggle it in the active filters.
+ * @param onAddDevelopment - Callback to add a new development (used by the disabled empty-state UI).
+ * @param onClearFilters - Callback to clear active filters (used by the disabled empty-state UI).
+ * @returns A JSX element containing the rendered TechTreeNode components for nodes that pass filtering and visibility checks.
+ */
 export default function TechTreeNodes({
   techNodes,
   selectedFilterTags,

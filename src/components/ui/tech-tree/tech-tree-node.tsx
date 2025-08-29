@@ -17,6 +17,22 @@ interface TechTreeNodeProps {
   onToggleFilterTag: (tag: string) => void
 }
 
+/**
+ * Renders a positioned interactive tech-tree node with title, year, category badges, and optional expanded details.
+ *
+ * The component styles its border using the era derived from `node.year`, displays expansion and details actions,
+ * and renders category badges whose colors are determined by `disciplineBands`. Clicking a badge toggles its filter
+ * state; when a badge is selected it receives a subtle background. When `node.expanded` is true the node shows its
+ * description and grows in height.
+ *
+ * @param node - Tech node data (expects at least `id`, `title`, `year`, `expanded`, `category`, and `description`).
+ * @param position - Absolute positioning for the node ({ left, top } in pixels).
+ * @param selectedFilterTags - Array of currently selected category tags used to determine badge selection state.
+ * @param onToggleExpansion - Callback invoked with `node.id` to toggle the node's expanded state.
+ * @param onOpenDetails - Callback invoked with the full `node` to open a details view.
+ * @param onToggleFilterTag - Callback invoked with a category tag string to toggle that filter.
+ * @returns The JSX element for the tech-tree node.
+ */
 export default function TechTreeNode({
   node,
   position,

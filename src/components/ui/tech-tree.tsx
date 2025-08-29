@@ -45,6 +45,20 @@ interface TechTreeProps {
   saveDevelopment: () => void // Session save
 }
 
+/**
+ * Renders the interactive technology timeline (tech tree) UI.
+ *
+ * The component wires user interactions (pan/zoom, selection, filtering, and collapsing eras/centuries)
+ * to the provided callbacks and state props, and composes the main pieces of the UI: controls,
+ * the draggable/zoomable canvas, a node details dialog, and an add-development dialog.
+ *
+ * - Shows a centered loading state until `isMounted` is true.
+ * - Computes collapsed centuries from `collapsedEras` and passes computed positions to the canvas.
+ * - Opens a details dialog for `selectedNode` (with Overview, Dependencies, Resources tabs).
+ * - When `isTeacher` is true, renders Edit and Delete actions inside the details dialog.
+ *
+ * @returns The TechTree React element.
+ */
 export default function TechTree({
   // Destructure all the new props
   nodes,
