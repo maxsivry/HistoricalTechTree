@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import type { TechNode } from "@/lib/types/tech-tree"
-import { getNodePosition, getCenturyForYear } from "@/utils/tech-tree-utils"
+import { getNodePosition, getCenturyForYear, getEraForYear } from "@/utils/tech-tree-utils"
 import TechTreeNode from "./tech-tree-node"
 
 interface TechTreeNodesProps {
@@ -11,6 +11,7 @@ interface TechTreeNodesProps {
   selectedFilterTags: string[]
   centuryPositions: Record<string, number>
   collapsedCenturies: string[]
+  collapsedEras: string[]
   onToggleExpansion: (nodeId: string | number) => void
   onOpenDetails: (node: TechNode) => void
   onToggleFilterTag: (tag: string) => void
@@ -23,6 +24,7 @@ export default function TechTreeNodes({
   selectedFilterTags,
   centuryPositions,
   collapsedCenturies,
+  collapsedEras,
   onToggleExpansion,
   onOpenDetails,
   onToggleFilterTag,
@@ -69,6 +71,11 @@ export default function TechTreeNodes({
 
       {/* Tech Nodes (Historical Developments) */}
       {filteredNodes.map((node) => {
+        // Skip nodes in collapsed eras
+        const era = getEraForYear(node.year)
+        if (era && collapsedEras.includes(era.id)) {
+          return null
+        }
         const position = getNodePosition(node, techNodes, centuryPositions, collapsedCenturies)
 
         // Skip rendering nodes in collapsed centuries
