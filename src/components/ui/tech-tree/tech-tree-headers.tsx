@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight, ChevronDown } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { eras } from "@/constants/tech-tree-constants"
 import { getEraPixelWidth, getTimelinePixelOffsetForYear, getTotalTimelineWidth } from "@/utils/tech-tree-utils"
 
