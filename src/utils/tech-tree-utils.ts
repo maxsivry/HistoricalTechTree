@@ -1,5 +1,6 @@
 import type { TechNode } from "@/lib/types/tech-tree"
 import { eras, centuries, disciplineBands } from "@/constants/tech-tree-constants"
+import type { Era } from "@/lib/types/tech-tree"
 
 // Get century for a specific year
 export const getCenturyForYear = (year: number) => {
@@ -17,6 +18,68 @@ export const getEraForYear = (year: number) => {
   return eras.find((era) => year >= era.startYear && year <= era.endYear)
 }
 
+// Compute exact pixel width of an era banner by summing the fractional
+// overlaps with visible timeline segments ("centuries").
+// - Each segment is 2400px wide.
+// - Collapsed segments contribute 0.
+// - Collapsed eras render as a fixed 60px stub for clickability.
+export const getEraPixelWidth = (
+  era: Era,
+  collapsedCenturies: string[],
+  collapsedEras: string[],
+): number => {
+  if (collapsedEras.includes(era.id)) return 60
+  let total = 0
+  for (const seg of centuries) {
+    if (collapsedCenturies.includes(seg.id)) continue
+    const overlapStart = Math.max(era.startYear, seg.startYear)
+    const overlapEnd = Math.min(era.endYear, seg.endYear)
+    if (overlapEnd > overlapStart) {
+      const frac = (overlapEnd - overlapStart) / (seg.endYear - seg.startYear)
+      total += frac * 2400
+    }
+  }
+  return total
+}
+
+// Compute the total pixel width of the visible timeline based on segments
+// that are not collapsed.
+export const getTotalTimelineWidth = (collapsedCenturies: string[]): number => {
+  // Width equals the sum of visible segments so header stays in sync with nodes
+  // when segments (centuries) are collapsed.
+  let total = 0
+  for (const seg of centuries) {
+    if (collapsedCenturies.includes(seg.id)) continue
+    total += 2400
+  }
+  return total
+}
+
+// Compute the pixel offset from the leftmost visible timeline origin to a
+// specific absolute year. Accounts for collapsed segments and partial segment coverage.
+export const getTimelinePixelOffsetForYear = (
+  year: number,
+  collapsedCenturies: string[],
+): number => {
+  // Offset computed relative to visible (non-collapsed) segments so header
+  // positions match the node canvas after collapses.
+  let offset = 0
+  for (const seg of centuries) {
+    if (collapsedCenturies.includes(seg.id)) continue
+    if (year >= seg.endYear) {
+      offset += 2400
+      continue
+    }
+    if (year <= seg.startYear) {
+      break
+    }
+    const frac = (year - seg.startYear) / (seg.endYear - seg.startYear)
+    offset += Math.max(0, Math.min(1, frac)) * 2400
+    break
+  }
+  return offset
+}
+
 // Calculate century positions based on which ones are collapsed
 export const calculateCenturyPositions = (collapsedCenturies: string[]) => {
   const positions: Record<string, number> = {}
@@ -25,7 +88,7 @@ export const calculateCenturyPositions = (collapsedCenturies: string[]) => {
   for (const century of centuries) {
     positions[century.id] = currentPosition
     if (!collapsedCenturies.includes(century.id)) {
-      currentPosition += 1200 // Each period is 1200px wide
+      currentPosition += 2400 // Each period is 2400px wide
     }
   }
 
@@ -50,7 +113,7 @@ export const getNodePositionSimple = (
   }
 
   // Calculate horizontal position based on year within century
-  const centuryWidth = 1200 // Width allocated for each century
+  const centuryWidth = 2400 // Width allocated for each century
   const yearPosition = (node.year - century.startYear) / (century.endYear - century.startYear)
   const left = centuryBasePosition + yearPosition * centuryWidth
 
@@ -99,56 +162,37 @@ export const getNodePosition = (
   }
 
   // Calculate horizontal position based on year within century
-  const centuryWidth = 1200 // Width allocated for each century
+  const centuryWidth = 2400 // Width allocated for each century
   const yearPosition = (node.year - century.startYear) / (century.endYear - century.startYear)
   const left = centuryBasePosition + yearPosition * centuryWidth
 
-  // Determine which discipline band this node belongs to (default to Other)
-  let bandPosition = disciplineBands.Other.position
-  let bandName: keyof typeof disciplineBands = "Other"
-
-  for (const [name, band] of Object.entries(disciplineBands) as [keyof typeof disciplineBands, (typeof disciplineBands)[keyof typeof disciplineBands]][]) {
-    if (node.category?.some((cat) => band.categories.includes(cat))) {
-      bandPosition = band.position
-      bandName = name
-      break
-    }
-  }
-
-  // Pixel-based unlimited-lane packing within the same band
+  // Global lane packing starting from a single baseline (no band separation)
   const NODE_WIDTH = 300
   const H_MARGIN = 12
-  const LANE_OFFSET = 160
+  const LANE_OFFSET = 120
+  const BASELINE_TOP = 120 // pixels
 
-  // Collect visible nodes in the same band (skip nodes in collapsed centuries)
-  const bandNodes = allNodes.filter((n) => {
-    // Determine n's band
-    let nBand: keyof typeof disciplineBands = "Other"
-    for (const [name, band] of Object.entries(disciplineBands) as [keyof typeof disciplineBands, (typeof disciplineBands)[keyof typeof disciplineBands]][]) {
-      if (n.category?.some((cat) => band.categories.includes(cat))) {
-        nBand = name
-        break
-      }
-    }
+  // Collect all visible nodes (skip nodes in collapsed centuries)
+  const visibleNodes = allNodes.filter((n) => {
     const nCentury = getCenturyForYear(n.year)
     if (!nCentury || collapsedCenturies.includes(nCentury.id)) return false
-    return nBand === bandName
+    return true
   })
 
-  // Precompute left positions for all band nodes
+  // Precompute left positions for all visible nodes
   const leftById = new Map<string | number, number>()
-  for (const n of bandNodes) {
+  for (const n of visibleNodes) {
     const c = getCenturyForYear(n.year)
     if (!c) continue
     const base = centuryPositions[c.id]
-    const centuryWidth = 1200
+    const centuryWidth = 2400
     const yearPos = (n.year - c.startYear) / (c.endYear - c.startYear)
     const lx = base + yearPos * centuryWidth
     leftById.set(n.id, lx)
   }
 
   // Sort by left, then id for stability
-  const sorted = bandNodes
+  const sorted = visibleNodes
     .slice()
     .sort((a, b) => {
       const la = leftById.get(a.id) ?? 0
@@ -181,6 +225,6 @@ export const getNodePosition = (
 
   return {
     left,
-    top: bandPosition + lane * LANE_OFFSET,
+    top: BASELINE_TOP + lane * LANE_OFFSET,
   }
 }

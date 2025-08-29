@@ -8,8 +8,9 @@ export const eras: Era[] = [
   ]
   
   
-  export const centuries: Century[] = [
+export const centuries: Century[] = [
     // BCE
+    { id: "prehistory-segment", name: "Prehistory", startYear: -10000, endYear: -3000 },
     { id: "early-antiquity", name: "Early Antiquity", startYear: -3000, endYear: -800 },
     { id: "classical-antiquity", name: "Classical Antiquity", startYear: -800, endYear: 500 },
     // CE
@@ -65,21 +66,7 @@ export const disciplineBands: DisciplineBands = {
   //   position: 800,
   //   color: "purple",
   // },
-  Other: {
-    categories: [
-      "Natural Philospher",
-      "Doctor",
-      "Geometer/Astronomy",
-      "Merchant",
-      "Politician",
-      "Kyrios",
-      "Dramatist",
-      "Philosopher",
-    ], 
-    position: 800,
-    color: "purple",
-
-  }
+  
 }
 
 // Available tags for developments
@@ -87,5 +74,4 @@ export const availableTags = [
   ...disciplineBands.STEM.categories,
   ...disciplineBands.Humanities.categories,
   ...disciplineBands["Social Studies"].categories,
-  ...disciplineBands.Other.categories,
 ]

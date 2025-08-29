@@ -106,6 +106,8 @@ export default function TechTree({
     }
   }, [collapsedEras])
 
+  // Default view starts at the earliest segment (-10000 BCE) with 50% zoom
+
   // If not mounted yet, return a loading state or nothing
   if (!isMounted) {
     return (

@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useRef } from "react"
 
 export const useTechTreeInteractions = () => {
-  const [zoomLevel, setZoomLevel] = useState(1)
+  const [zoomLevel, setZoomLevel] = useState(0.5)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const [startDragPosition, setStartDragPosition] = useState({ x: 0, y: 0 })
@@ -74,6 +74,7 @@ export const useTechTreeInteractions = () => {
   return {
     zoomLevel,
     position,
+    setPosition,
     containerRef,
     handleZoom,
     handleMouseDown,

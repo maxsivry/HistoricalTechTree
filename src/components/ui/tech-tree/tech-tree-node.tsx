@@ -6,6 +6,7 @@ import { ChevronUp, ChevronDown, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { TechNode } from "@/lib/types/tech-tree"
 import { getEraForYear } from "@/utils/tech-tree-utils"
+import { disciplineBands } from "@/constants/tech-tree-constants"
 
 interface TechTreeNodeProps {
   node: TechNode
@@ -54,18 +55,32 @@ export default function TechTreeNode({
       </div>
 
       <div className="flex flex-wrap gap-1 mb-2">
-        {(node.category || []).map((cat) => (
-          <Badge
-            key={cat}
-            variant={selectedFilterTags.includes(cat) ? "default" : "secondary"}
-            className={`text-xs cursor-pointer ${
-              selectedFilterTags.includes(cat) ? "bg-primary hover:bg-primary/90" : ""
-            }`}
-            onClick={() => onToggleFilterTag(cat)}
-          >
-            {cat}
-          </Badge>
-        ))}
+        {(node.category || []).map((cat) => {
+          let color: string | null = null
+          for (const [, band] of Object.entries(disciplineBands)) {
+            if (band.categories.includes(cat)) {
+              color = band.color
+              break
+            }
+          }
+          const base = color || "slate"
+          const isSelected = selectedFilterTags.includes(cat)
+          const borderClass = `border-${base}-600`
+          const textClass = `text-${base}-700`
+          const bgClass = isSelected ? `bg-${base}-100` : ""
+
+          return (
+            <Badge
+              key={cat}
+              variant="outline"
+              className={`text-xs cursor-pointer ${borderClass} ${textClass} ${bgClass}`}
+              onClick={() => onToggleFilterTag(cat)}
+              title={isSelected ? "Click to remove filter" : "Click to filter by this tag"}
+            >
+              {cat}
+            </Badge>
+          )
+        })}
       </div>
 
       {node.expanded && <p className="text-xs text-slate-600 dark:text-slate-300 mt-2">{node.description}</p>}

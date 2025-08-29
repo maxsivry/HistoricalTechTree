@@ -1,7 +1,8 @@
 import type { TechNode } from "@/lib/types/tech-tree"
-import { getNodePosition, getCenturyForYear } from "@/utils/tech-tree-utils"
+import { getNodePosition, getCenturyForYear, getEraForYear } from "@/utils/tech-tree-utils"
 import TechTreeHeaders from "./tech-tree-headers"
 import TechTreeNodes from "./tech-tree-nodes"
+import { eras } from "@/constants/tech-tree-constants"
 
 interface TechTreeCanvasProps {
   techNodes: TechNode[]
@@ -34,6 +35,7 @@ export default function TechTreeCanvas({
   onAddDevelopment,
   onClearFilters,
 }: TechTreeCanvasProps) {
+  // Era header aligns directly with the node canvas horizontally (no offset).
   // Render connections between nodes
   const renderConnections = () => {
     // Get filtered nodes
@@ -44,9 +46,10 @@ export default function TechTreeCanvas({
 
     return filteredNodes
       .flatMap((node) => {
-        // Skip nodes in collapsed centuries
+        // Skip nodes in collapsed eras or collapsed centuries
         const nodeCentury = getCenturyForYear(node.year)
-        if (!nodeCentury || collapsedCenturies.includes(nodeCentury.id)) {
+        const nodeEra = getEraForYear(node.year)
+        if (!nodeCentury || collapsedCenturies.includes(nodeCentury.id) || (nodeEra && collapsedEras.includes(nodeEra.id))) {
           return null
         }
 
@@ -54,9 +57,10 @@ export default function TechTreeCanvas({
           const depNode = techNodes.find((n) => n.id === depId)
           if (!depNode) return null
 
-          // Skip if dependency node is in a collapsed century
+          // Skip if dependency node is in a collapsed era or century
           const depCentury = getCenturyForYear(depNode.year)
-          if (!depCentury || collapsedCenturies.includes(depCentury.id)) {
+          const depEra = getEraForYear(depNode.year)
+          if (!depCentury || collapsedCenturies.includes(depCentury.id) || (depEra && collapsedEras.includes(depEra.id))) {
             return null
           }
 
@@ -89,6 +93,24 @@ export default function TechTreeCanvas({
 
   return (
     <>
+      {/* Always-visible collapsed era toggles pinned to viewport */}
+      <div className="absolute top-2 left-2 z-30 flex gap-2 pointer-events-auto">
+        {collapsedEras.map((eraId) => {
+          const e = eras.find((er) => er.id === eraId)
+          if (!e) return null
+          return (
+            <button
+              key={eraId}
+              onClick={() => onToggleEraCollapse(eraId)}
+              className="px-2 py-1 text-xs rounded bg-slate-800 text-white/90 hover:bg-slate-700 shadow"
+              title={`Expand ${e.name}`}
+            >
+              ▶ {e.name}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Fixed Era Banner overlay at top of the timeline window */}
       <div
         className="absolute top-0 left-0 right-0 z-20 bg-transparent"
@@ -106,23 +128,7 @@ export default function TechTreeCanvas({
         />
       </div>
 
-      {/* Fixed left-side Band Labels overlay aligned with vertical scroll/zoom */}
-      <div
-        className="absolute top-0 left-0 z-20 bg-transparent"
-        style={{
-          transform: `translate(0px, ${position.y}px) scale(${zoomLevel})`,
-          transformOrigin: "0 0",
-        }}
-      >
-        <TechTreeHeaders
-          collapsedCenturies={collapsedCenturies}
-          collapsedEras={collapsedEras}
-          onToggleEraCollapse={onToggleEraCollapse}
-          showBandLabels={true}
-          showEraBanner={false}
-          bandLabelsLeft={8}
-        />
-      </div>
+      {/* Band Labels removed as per new uniform baseline design */}
 
       {/* SVG for connections */}
       <svg
@@ -155,6 +161,7 @@ export default function TechTreeCanvas({
           selectedFilterTags={selectedFilterTags}
           centuryPositions={centuryPositions}
           collapsedCenturies={collapsedCenturies}
+          collapsedEras={collapsedEras}
           onToggleExpansion={onToggleExpansion}
           onOpenDetails={onOpenDetails}
           onToggleFilterTag={onToggleFilterTag}
