@@ -11,6 +11,7 @@ import { useTechTreeInteractions } from "@/hooks/use-tech-tree-interactions"
 import TechTreeControls from "@/components/ui/tech-tree/tech-tree-controls"
 import TechTreeCanvas from "@/components/ui/tech-tree/tech-tree-canvas"
 import AddDevelopmentDialog from "@/components/ui/tech-tree/add-development-dialog"
+import { toExternalHref } from "@/utils/url"
 
 
 
@@ -215,7 +216,7 @@ export default function TechTree({
                       {selectedNode.links.map((link, index) => (
                         <li key={index} className="mb-2">
                           <a
-                            href={link.url}
+                            href={toExternalHref(link.url)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-500 hover:underline"
