@@ -37,6 +37,29 @@ interface PersistantNodeFormProps {
   onSave: () => void
 }
 
+/**
+ * Controlled React form component for creating or editing a TechNode.
+ *
+ * Renders a multi-section form (title, year with BCE/CE toggle, description, tags, discipline badges,
+ * dependencies, links, people) driven entirely by the supplied props. Inputs are controlled by the
+ * provided `formData`, `newLink`, and `newPerson` values and update via the corresponding callback props.
+ *
+ * Notable behaviors:
+ * - Year handling: interprets `formData.year` as a number or numeric string and computes a signed year
+ *   based on `yearType` (BCE -> negative, CE -> positive). Non-numeric years are treated as negative infinity
+ *   for dependency filtering.
+ * - Dependencies: eligible past nodes are derived from `allNodes` (excluding the current node and any node
+ *   with non-numeric year) and filtered to those strictly earlier than the computed year. A search input
+ *   (internal state `depQuery`) filters past nodes by title; selected dependencies are shown as removable badges.
+ * - Tags/discipline badges reflect membership of `formData.category` and call `onCategoryChange` when toggled.
+ * - Links and people sections support listing, adding, and removing items via the corresponding callbacks.
+ *
+ * All user actions are propagated via the callback props (e.g., `onInputChange`, `onYearTypeChange`,
+ * `onDependenciesChange`, `onAddLink`, `onRemoveLink`, `onSetNewLink`, `onAddPerson`, `onRemovePerson`,
+ * `onSetNewPerson`, `onCancel`, `onSave`).
+ *
+ * @returns The JSX element for the persistent node form.
+ */
 export default function PersistantNodeForm({
   formData,
   yearType,

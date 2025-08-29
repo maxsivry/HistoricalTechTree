@@ -22,6 +22,20 @@ interface TechTreeControlsProps {
   onClearFilters: () => void
 }
 
+/**
+ * Controls UI for the tech tree: zoom controls, "Add Development" action, and tag-based filters.
+ *
+ * Renders zoom in/out buttons with the current zoom percentage, an "Add Development" button, a
+ * per-band dropdown list of tag checkboxes, and an "Active" area showing selected tags as removable
+ * colored badges. Interactions call the corresponding callbacks passed via props.
+ *
+ * @param zoomLevel - Current zoom level (0–1), displayed as a rounded percentage.
+ * @param selectedFilterTags - List of currently selected tag strings shown in the active badges and used to set checkbox states.
+ * @param onZoom - Called with "in" or "out" when the zoom buttons are pressed.
+ * @param onAddDevelopment - Called when the Add Development button is clicked.
+ * @param onToggleFilterTag - Called with a tag string to toggle that tag's selection (used by checkboxes and active badges).
+ * @param onClearFilters - Called to clear all selected filter tags.
+ */
 export default function TechTreeControls({
   zoomLevel,
   selectedFilterTags,

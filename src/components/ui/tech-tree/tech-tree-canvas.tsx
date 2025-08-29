@@ -20,6 +20,27 @@ interface TechTreeCanvasProps {
   onClearFilters: () => void
 }
 
+/**
+ * Renders the interactive technology tree canvas including era controls, era banner, connection SVG, and node panel.
+ *
+ * The component displays tech nodes and their dependency connections, applying tag filters and collapse state for centuries and eras.
+ * Connections are drawn only when both source and target nodes are visible under the current filters and collapse settings.
+ *
+ * @param techNodes - Array of tech nodes to render.
+ * @param selectedFilterTags - If non-empty, only nodes (and their connections) whose category includes all tags are shown.
+ * @param centuryPositions - Mapping of century IDs to layout positions used to compute node coordinates.
+ * @param collapsedCenturies - Century IDs that are collapsed (nodes and connections in those centuries are hidden).
+ * @param collapsedEras - Era IDs that are collapsed (nodes and connections in those eras are hidden).
+ * @param position - Current pan offset applied to headers, SVG, and node layers.
+ * @param zoomLevel - Current zoom scale applied to headers, SVG, and node layers.
+ * @param onToggleEraCollapse - Handler invoked with an era ID to toggle its collapsed state.
+ * @param onToggleExpansion - Handler invoked to expand/collapse a node.
+ * @param onOpenDetails - Handler invoked to open node details.
+ * @param onToggleFilterTag - Handler invoked to toggle a filter tag on a node.
+ * @param onAddDevelopment - Handler invoked to add a new development/node.
+ * @param onClearFilters - Handler invoked to clear active filters.
+ * @returns A JSX element containing the full tech tree canvas.
+ */
 export default function TechTreeCanvas({
   techNodes,
   selectedFilterTags,

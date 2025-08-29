@@ -23,6 +23,27 @@ interface AddDevelopmentDialogProps {
   onSave: () => void
 }
 
+/**
+ * Modal dialog that renders a form for creating a new historical development.
+ *
+ * The dialog collects title, year (with BCE/CE), description, tags, links, and dependencies.
+ * It shows currently selected dependencies as chips and provides a searchable list of nodes to add/remove dependencies.
+ *
+ * @param open - Controls whether the dialog is visible.
+ * @param onOpenChange - Called when the dialog open state changes; receiving the new open value.
+ * @param nodes - List of available TechNode items used to resolve and search dependencies.
+ * @param newDevelopment - Current draft values for the development being edited (title, year, yearType, description, category, links, dependencies).
+ * @param newLink - Temporary input values for a link (title and url) before it's added to `newDevelopment.links`.
+ * @param setNewLink - Updates the `newLink` temporary input object.
+ * @param handleInputChange - Handler for text inputs and textarea (updates fields like title, year, description).
+ * @param handleYearTypeChange - Toggles the year type between `"BCE"` and `"CE"`.
+ * @param handleTagToggle - Toggles a tag in the draft development's category list.
+ * @param handleDependencyToggle - Toggles a dependency by node ID (accepts stringified id).
+ * @param addLink - Adds the current `newLink` into `newDevelopment.links`.
+ * @param removeLink - Removes a link from `newDevelopment.links` by index.
+ * @param onSave - Called to persist the new development (triggered by the "Add for Session" action).
+ * @returns The dialog React element.
+ */
 export default function AddDevelopmentDialog({
   open,
   onOpenChange,
