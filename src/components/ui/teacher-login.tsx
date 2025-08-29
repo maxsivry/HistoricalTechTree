@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 // const email = process.env.EMAIL
 
 interface TeacherLoginProps {
-  onLogin: (isTeacher: boolean) => void;
+  onLogin?: (isTeacher: boolean) => void;
 }
 
 export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
@@ -26,8 +26,8 @@ export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
       return;
     }
 
-    // If login is successful, grant teacher access for the session.
-    onLogin(true);
+    // If provided, notify parent; hook will set TTL and session.
+    onLogin?.(true);
   };
 
   return (

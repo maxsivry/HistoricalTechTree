@@ -13,6 +13,7 @@ import { eras, availableTags } from "@/constants/tech-tree-constants";
 
 
 import { isSessionNode } from "@/utils/tech-tree-utils";
+import { useTeacherAuth } from "@/hooks/use-teacher-auth";
 
 
 interface TechTreeEditorProps {
@@ -55,7 +56,7 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
    // This state is specific to the NodeEditor (teacher's editor)
    const [editorOpen, setEditorOpen] = useState(false)
    const [editingNode, setEditingNode] = useState<TechNode | null>(null)
-   const [isTeacher, setIsTeacher] = useState(false); 
+   const { isTeacher, endTeacherSession } = useTeacherAuth(); 
    const handleAddNode = () => {
      setEditingNode(null) // Clear any previously edited node
      setEditorOpen(true)
@@ -151,14 +152,19 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
   return (
     <div className="w-full h-screen flex flex-col">
       <div className="bg-slate-200 dark:bg-slate-800 p-4 flex justify-between items-center border-b">
-      <div className="text-2xl font-bold">Historical Tech Tree</div>
-        {isTeacher ? (
-          <Button variant="materialFilled" onClick={handleAddNode}>
-            <Plus className="mr-2 h-4 w-4" /> Add Development to Database
-          </Button>
-        ) : (
-          <TeacherLogin onLogin={setIsTeacher} />
-        )}
+        <div className="text-2xl font-bold">Historical Tech Tree</div>
+        <div className="flex items-center gap-2">
+          {isTeacher ? (
+            <>
+              <Button variant="materialFilled" onClick={handleAddNode}>
+                <Plus className="mr-2 h-4 w-4" /> Add Development to Database
+              </Button>
+              <Button variant="outline" onClick={endTeacherSession}>Log out</Button>
+            </>
+          ) : (
+            <TeacherLogin />
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-hidden">
