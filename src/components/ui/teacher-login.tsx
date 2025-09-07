@@ -17,7 +17,7 @@ export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
 
   const handleLogin = async () => {
     const { data: _data, error } = await supabase.auth.signInWithPassword({
-      email: "maxssivry@gmail.com", 
+      email: "maxjsl@gmail.com", 
       password,
     });
 
