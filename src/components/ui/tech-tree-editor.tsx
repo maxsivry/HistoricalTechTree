@@ -2,13 +2,15 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Settings } from "lucide-react"
 import type { TechNode } from "@/lib/types/tech-tree"
 import NodeEditor from "./node-editor"
 import TechTree from "./tech-tree"
 import { supabase } from "@/lib/supabaseClient"; 
 import { useTechTreeState } from "@/hooks/use-tech-tree-state"
 import TeacherLogin from "./teacher-login";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import VisuallyHidden from "@/components/ui/visually-hidden"
 import { eras, availableTags } from "@/constants/tech-tree-constants";
 
 
@@ -57,6 +59,7 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
    const [editorOpen, setEditorOpen] = useState(false)
    const [editingNode, setEditingNode] = useState<TechNode | null>(null)
    const { isTeacher, endTeacherSession } = useTeacherAuth(); 
+   const [settingsOpen, setSettingsOpen] = useState(false)
    const handleAddNode = () => {
      setEditingNode(null) // Clear any previously edited node
      setEditorOpen(true)
@@ -151,9 +154,9 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
 
   return (
     <div className="w-full h-screen flex flex-col">
-      <div className="bg-slate-200 dark:bg-slate-800 p-4 flex justify-between items-center border-b">
-        <div className="text-2xl font-bold">Historical Tech Tree</div>
-        <div className="flex items-center gap-2">
+      <div className="bg-slate-200 dark:bg-slate-800 p-4 flex items-center border-b relative">
+        <div className="absolute left-1/2 -translate-x-1/2 text-2xl font-bold">Historical Tech Tree</div>
+        <div className="ml-auto flex items-center gap-2">
           {isTeacher ? (
             <>
               <Button variant="materialFilled" onClick={handleAddNode}>
@@ -162,7 +165,14 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
               <Button variant="outline" onClick={endTeacherSession}>Log out</Button>
             </>
           ) : (
-            <TeacherLogin />
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Open settings"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           )}
         </div>
       </div>
@@ -212,6 +222,18 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
         categories={availableTags}
         eras={eras.map((era) => ({ id: `${era.startYear}-${era.endYear}`, name: era.name }))}
       />
+
+      {/* Settings / Login Dialog */}
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent>
+          <VisuallyHidden>
+            <DialogTitle>Settings</DialogTitle>
+          </VisuallyHidden>
+          <div className="mt-2">
+            <TeacherLogin onLogin={() => setSettingsOpen(false)} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

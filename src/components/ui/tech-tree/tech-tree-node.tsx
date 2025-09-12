@@ -31,7 +31,7 @@ export default function TechTreeNode({
     <div
       className={cn(
         "absolute border-2 rounded-md p-3 w-[300px] bg-white dark:bg-slate-800 shadow-md transition-all cursor-pointer",
-        node.expanded ? "h-auto" : "h-[100px] overflow-hidden",
+        node.expanded ? "h-auto z-30" : "h-[100px] overflow-hidden z-10",
         era ? `border-${era.color.replace("bg-", "")}` : "border-gray-400",
       )}
       style={{
