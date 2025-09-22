@@ -21,7 +21,7 @@ export const centuries: Century[] = [
     { id: "21st-century", name: "21st Century", startYear: 2000, endYear: 2100 },
   ]
 
-//to add a category, add the name of the category in double quotes inside of the comma separated list ["A", "B", "C"]
+//to add a category, add the name of the category in double quotes inside of the comma separated list ["A", "B", "C"] under the corresponding discipline
 export const disciplineBands: DisciplineBands = {
   STEM: {
     categories: ["Mathematics", "Engineering", "Technology", "Medicine", "Astronomy", "Physics", "Chemistry", "Biology", "Agriculture" ],
@@ -29,7 +29,7 @@ export const disciplineBands: DisciplineBands = {
     color: "emerald",
   },
   Humanities: {
-    categories: ["Literature", "Art", "Religion", "Philosophy", "Media", "Music"],
+    categories: ["Literature", "Art", "Religion", "Philosophy", "Media", "Music" ],
     position: 400,
     color: "blue",
   },
