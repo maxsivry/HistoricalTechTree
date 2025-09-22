@@ -12,17 +12,27 @@ interface TeacherLoginProps {
 }
 
 export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setError("")
+    if (!email) {
+      setError("Please enter your email.")
+      return
+    }
+    if (!password) {
+      setError("Please enter your password.")
+      return
+    }
     const { data: _data, error } = await supabase.auth.signInWithPassword({
-      email: "maxjsl@gmail.com", 
+      email,
       password,
     });
 
     if (error) {
-      setError("Invalid password");
+      setError("Invalid email or password");
       return;
     }
 
@@ -32,6 +42,12 @@ export default function TeacherLogin({ onLogin }: TeacherLoginProps) {
 
   return (
     <div className="flex flex-col gap-2">
+      <Input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter teacher email"
+      />
       <Input
         type="password"
         value={password}
