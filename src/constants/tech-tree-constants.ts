@@ -48,25 +48,7 @@ export const disciplineBands: DisciplineBands = {
     position: 600,
     color: "amber",
   },
-  // Geography: {
-  //   categories: [
-  //     "Hellas",
-  //     "Athens",
-  //     "Sparta",
-  //     "Asia Minor",
-  //     "Persian Empire",
-  //     "Greek Islands",
-  //     "Egypt",
-  //     "Thebes",
-  //     "Corinth",
-  //     "Minor Poleis",
-  //     "Beyond Hellas",
-  //     "Black Sea",
-  //   ],
-  //   position: 800,
-  //   color: "purple",
-  // },
-  
+
 }
 
 // Available tags for developments
