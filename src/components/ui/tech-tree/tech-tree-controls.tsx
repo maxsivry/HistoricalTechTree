@@ -26,7 +26,6 @@ export default function TechTreeControls({
   zoomLevel,
   selectedFilterTags,
   onZoom,
-  onAddDevelopment,
   onToggleFilterTag,
   onClearFilters,
 }: TechTreeControlsProps) {
@@ -69,11 +68,7 @@ export default function TechTreeControls({
             <Plus className="h-4 w-4" />
           </Button>
         </div>
-        <div>
-          <Button variant="materialFilled" onClick={onAddDevelopment} className="ml-4">
-            <Plus className="h-4 w-4 mr-2" /> Add Development
-          </Button>
-        </div>
+        {/* Removed "Add Development" button */}
       </div>
 
       <div className="mb-2">
