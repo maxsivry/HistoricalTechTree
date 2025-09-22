@@ -26,7 +26,6 @@ export default function TechTreeControls({
   zoomLevel,
   selectedFilterTags,
   onZoom,
-  onAddDevelopment,
   onToggleFilterTag,
   onClearFilters,
 }: TechTreeControlsProps) {
