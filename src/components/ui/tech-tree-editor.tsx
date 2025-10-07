@@ -12,6 +12,7 @@ import TeacherLogin from "./teacher-login";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import VisuallyHidden from "@/components/ui/visually-hidden"
 import { eras, availableTags } from "@/constants/tech-tree-constants";
+import { useRouter } from "next/navigation";
 
 
 import { isSessionNode } from "@/utils/tech-tree-utils";
@@ -26,6 +27,7 @@ interface TechTreeEditorProps {
 // Categories come from tech-tree-constants
 
 export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps) {
+  const router = useRouter()
   const {
     techNodes,
     selectedNode,
@@ -98,13 +100,16 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
     // If the node has a real ID (not a session ID), it's an update.
     if (editingNode) {
       console.log("Updating existing node:", node.id);
-      const updatePayload = toDbPayload(node)
+      const { id: _omitId, ...updatePayload } = toDbPayload(node)
       console.log("Update payload:", updatePayload);
       const { error } = await supabase.from("developments").update(updatePayload).eq("id", node.id)
       if (error) {
         console.error("Error updating node:", error)
         console.log("Node data:", node);
         alert(`Error updating node: ${error.message}`)
+      } else {
+        // Ensure UI reflects latest server data
+        router.refresh()
       }
     } else {
       // Otherwise, it's a new node to be inserted.
@@ -116,6 +121,8 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
       if (error) {
         console.error("Error creating node:", error);
         alert(`Error creating node: ${error.message}`);
+      } else {
+        router.refresh()
       }
     }
     // The real-time listener will automatically update the UI.
@@ -143,6 +150,8 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
       if (error) {
         console.error("Error deleting node:", error);
         alert(`Error deleting node: ${error.message}`);
+      } else {
+        router.refresh()
       }
       // The real-time listener will handle UI updates for all clients.
       // We can also close the dialog if the selected node was the one deleted.

@@ -12,7 +12,10 @@ export const centuries: Century[] = [
     // BCE
     { id: "prehistory-segment", name: "Prehistory", startYear: -10000, endYear: -3000 },
     { id: "early-antiquity", name: "Early Antiquity", startYear: -3000, endYear: -800 },
-    { id: "classical-antiquity", name: "Classical Antiquity", startYear: -800, endYear: 500 },
+    // Split Classical Antiquity into finer blocks to widen Archaic/Classical visually
+    { id: "archaic-age-block", name: "Archaic Age Block", startYear: -800, endYear: -500 },
+    { id: "classical-age-block", name: "Classical Age Block", startYear: -500, endYear: -300 },
+    { id: "late-classical-antiquity", name: "Late Classical Antiquity", startYear: -300, endYear: 500 },
     // CE
     { id: "middle-ages", name: "Middle Ages", startYear: 500, endYear: 1400 },
     { id: "early-modern", name: "Early Modern", startYear: 1400, endYear: 1700 },
