@@ -20,10 +20,14 @@ export const useTechTreeInteractions = () => {
   // Handle zoom in/out
   const handleZoom = (direction: "in" | "out") => {
     setZoomLevel((prev) => {
-      if (direction === "in" && prev < 2) return prev + 0.1
-      if (direction === "out" && prev > 0.5) return prev - 0.1
+      if (direction === "in" && prev < 2) return Math.min(2, parseFloat((prev + 0.1).toFixed(2)))
+      if (direction === "out" && prev > 0.5) return Math.max(0.5, parseFloat((prev - 0.1).toFixed(2)))
       return prev
     })
+  }
+  const setZoomLevelDirect = (value: number) => {
+    const clamped = Math.min(2, Math.max(0.5, value))
+    setZoomLevel(parseFloat(clamped.toFixed(2)))
   }
 
   // Handle mouse down for dragging
@@ -98,5 +102,6 @@ export const useTechTreeInteractions = () => {
     handleMouseMove,
     handleMouseUp,
     handleWheel,
+    setZoomLevelDirect,
   }
 }

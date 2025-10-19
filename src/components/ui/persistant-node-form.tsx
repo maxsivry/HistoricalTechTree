@@ -35,6 +35,7 @@ interface PersistantNodeFormProps {
   onSetNewPerson: (name: string) => void
   onCancel: () => void
   onSave: () => void
+  isSaving: boolean
 }
 
 export default function PersistantNodeForm({
@@ -58,6 +59,7 @@ export default function PersistantNodeForm({
   onSetNewPerson,
   onCancel,
   onSave,
+  isSaving,
 }: PersistantNodeFormProps) {
   const [depQuery, setDepQuery] = useState("")
   return (
@@ -256,8 +258,10 @@ export default function PersistantNodeForm({
       </div>
 
       <DialogFooter>
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button onClick={onSave}>Save</Button>
+        <Button variant="outline" onClick={onCancel} disabled={isSaving}>Cancel</Button>
+        <Button onClick={onSave} disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </Button>
       </DialogFooter>
     </>
   )

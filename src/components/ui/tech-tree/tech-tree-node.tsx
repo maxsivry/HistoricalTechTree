@@ -38,17 +38,36 @@ export default function TechTreeNode({
         left: `${position.left}px`,
         top: `${position.top}px`,
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation()
+        onOpenDetails(node)
+      }}
     >
       <div className="flex justify-between items-start mb-2">
         <h3 className="font-bold text-sm">
           {node.title} ({node.year < 0 ? `${Math.abs(node.year)} BCE` : `${node.year} CE`})
         </h3>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onToggleExpansion(node.id)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={(event) => {
+              event.stopPropagation()
+              onToggleExpansion(node.id)
+            }}
+          >
             {node.expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onOpenDetails(node)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={(event) => {
+              event.stopPropagation()
+              onOpenDetails(node)
+            }}
+          >
             <Info className="h-4 w-4" />
           </Button>
         </div>
@@ -74,7 +93,10 @@ export default function TechTreeNode({
               key={cat}
               variant="outline"
               className={`text-xs cursor-pointer ${borderClass} ${textClass} ${bgClass}`}
-              onClick={() => onToggleFilterTag(cat)}
+              onClick={(event) => {
+                event.stopPropagation()
+                onToggleFilterTag(cat)
+              }}
               title={isSelected ? "Click to remove filter" : "Click to filter by this tag"}
             >
               {cat}

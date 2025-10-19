@@ -44,6 +44,7 @@ interface TechTreeProps {
   removeLink: (index: number) => void
   handleTagToggle: (tag: string) => void
   saveDevelopment: () => void // Session save
+  isDeletingFromDb: boolean
 }
 
 export default function TechTree({
@@ -75,17 +76,18 @@ export default function TechTree({
   removeLink,
   handleTagToggle,
   saveDevelopment,
+  isDeletingFromDb,
 }: TechTreeProps) {
   
   const {
     zoomLevel,
     position,
     containerRef,
-    handleZoom,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
     handleWheel,
+    setZoomLevelDirect,
   } = useTechTreeInteractions()
 
 
@@ -124,8 +126,7 @@ export default function TechTree({
       <TechTreeControls
         zoomLevel={zoomLevel}
         selectedFilterTags={selectedFilterTags}
-        onZoom={handleZoom}
-        onAddDevelopment={() => setAddDialogOpen(true)}
+        onZoomLevelChange={setZoomLevelDirect}
         onToggleFilterTag={toggleFilterTag}
         onClearFilters={clearFilters}
       />
@@ -237,8 +238,13 @@ export default function TechTree({
                   <Button onClick={() => onEditNode(selectedNode)} className="mt-4">
                     Edit Persistent Development
                   </Button>
-                  <Button variant="destructive" onClick={() => onDeleteNode(String(selectedNode.id))} className="mt-2">
-                     Delete Development From Database
+                  <Button
+                    variant="destructive"
+                    onClick={() => onDeleteNode(String(selectedNode.id))}
+                    disabled={isDeletingFromDb}
+                    className="mt-2"
+                  >
+                    {isDeletingFromDb ? "Deleting..." : "Delete Development From Database"}
                   </Button>
                 </>
               )}

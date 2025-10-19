@@ -10,14 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Plus, Minus, ChevronDown, X } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 import { disciplineBands } from "@/constants/tech-tree-constants"
 
 interface TechTreeControlsProps {
   zoomLevel: number
   selectedFilterTags: string[]
-  onZoom: (direction: "in" | "out") => void
-  onAddDevelopment: () => void
+  onZoomLevelChange: (value: number) => void
   onToggleFilterTag: (tag: string) => void
   onClearFilters: () => void
 }
@@ -25,7 +24,7 @@ interface TechTreeControlsProps {
 export default function TechTreeControls({
   zoomLevel,
   selectedFilterTags,
-  onZoom,
+  onZoomLevelChange,
   onToggleFilterTag,
   onClearFilters,
 }: TechTreeControlsProps) {
@@ -56,32 +55,21 @@ export default function TechTreeControls({
     return colorMap[(color as keyof typeof colorMap) || "purple"]
   }
 
+  const zoomPercent = Math.round(zoomLevel * 100)
+
   return (
     <div className="bg-slate-200 dark:bg-slate-800 p-4 flex flex-col gap-4 border-b">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => onZoom("out")}>
-            <Minus className="h-4 w-4" />
-          </Button>
-          <span className="mx-2 text-sm">{Math.round(zoomLevel * 100)}%</span>
-          <Button variant="outline" size="icon" onClick={() => onZoom("in")}>
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        {/* Removed "Add Development" button */}
-      </div>
-
-      <div className="mb-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-md font-semibold pb-2 text-gray-900">Filter Tree by Tags:</span>
-                <Badge
-                  variant="secondary"
-                  className={`ml-2 ${selectedFilterTags.length === 0 ? "invisible" : ""}`}
-                >
-                  {selectedFilterTags.length} selected
-                </Badge>
-              </div>
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-4 md:w-fit md:[grid-template-columns:auto_auto] md:items-start md:justify-items-start">
+          <div className="flex flex-col">
+            <div className="flex flex-wrap">
+              <span className="text-md font-semibold text-gray-900">Filter Tree by Tags:</span>
+              <Badge
+                variant="secondary"
+                className={`${selectedFilterTags.length === 0 ? "invisible" : ""}`}
+              >
+                {selectedFilterTags.length} selected
+              </Badge>
               <Button
                 variant="outline"
                 size="sm"
@@ -92,69 +80,89 @@ export default function TechTreeControls({
               </Button>
             </div>
 
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-wrap gap-3 flex-1">
-                {Object.entries(disciplineBands).map(([bandName, band]) => {
-                  const selectedCount = getSelectedCount(bandName)
-                  const colorClasses = getColorClasses(band.color)
+            <div className="flex flex-wrap items-center gap-3">
+              {Object.entries(disciplineBands).map(([bandName, band]) => {
+                const selectedCount = getSelectedCount(bandName)
+                const colorClasses = getColorClasses(band.color)
 
-                  return (
-                    <DropdownMenu key={bandName}>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="h-10 px-4 justify-between min-w-[120px] bg-transparent">
-                          <span className="flex items-center gap-2">
-                            <span className={colorClasses.text}>{bandName}</span>
-                            {selectedCount > 0 && (
-                              <Badge variant="secondary" className="h-5 px-1.5 text-xs">
-                                {selectedCount}
-                              </Badge>
-                            )}
-                          </span>
-                          <ChevronDown className="h-4 w-4 ml-2" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56" align="start">
-                        <DropdownMenuLabel className={colorClasses.text}>{bandName}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        {band.categories.map((category) => (
-                          <DropdownMenuCheckboxItem
-                            key={category}
-                            checked={selectedFilterTags.includes(category)}
-                            onCheckedChange={() => onToggleFilterTag(category)}
-                          >
-                            {category}
-                          </DropdownMenuCheckboxItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )
-                })}
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0 max-w-[40%] justify-end min-h-6 overflow-x-auto whitespace-nowrap">
-                <span className={`text-sm font-medium text-gray-700 ${selectedFilterTags.length === 0 ? "invisible" : ""}`}>
-                  Active:
-                </span>
-                <div className="flex gap-2 justify-end">
-                  {selectedFilterTags.map((tag) => {
-                    const bandEntry = Object.entries(disciplineBands).find(([, band]) => band.categories.includes(tag))
-                    const bandColor = bandEntry ? bandEntry[1].color : "purple"
-                    const colorClasses = getColorClasses(bandColor, true)
-
-                    return (
-                      <Badge
-                        key={tag}
-                        variant={selectedFilterTags.includes(tag) ? "default" : "secondary"}
-                        className={`text-xs cursor-pointer ${colorClasses.bg}`}
-                        onClick={() => onToggleFilterTag(tag)}
-                      >
-                        {tag}
-                        <X className="h-3 w-3 ml-1" />
-                      </Badge>
-                    )
-                  })}
-                </div>
-              </div>
+                return (
+                  <DropdownMenu key={bandName}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="h-10 px-4 justify-between min-w-[120px] bg-transparent">
+                        <span className="flex items-center gap-2">
+                          <span className={colorClasses.text}>{bandName}</span>
+                          {selectedCount > 0 && (
+                            <Badge variant="secondary" className="h-5 px-1.5 text-xs">
+                              {selectedCount}
+                            </Badge>
+                          )}
+                        </span>
+                        <ChevronDown className="h-4 w-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="start">
+                      <DropdownMenuLabel className={colorClasses.text}>{bandName}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {band.categories.map((category) => (
+                        <DropdownMenuCheckboxItem
+                          key={category}
+                          checked={selectedFilterTags.includes(category)}
+                          onCheckedChange={() => onToggleFilterTag(category)}
+                          onSelect={(event) => event.preventDefault()}
+                          className="flex cursor-pointer items-center gap-2 rounded-md border border-transparent px-2 py-1.5 text-sm transition-colors data-[highlighted]:border-slate-300 data-[highlighted]:bg-slate-100 data-[state=checked]:border-slate-400 data-[state=checked]:bg-slate-100 dark:data-[highlighted]:border-slate-600 dark:data-[highlighted]:bg-slate-800 dark:data-[state=checked]:border-slate-500 dark:data-[state=checked]:bg-slate-800"
+                        >
+                          {category}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )
+              })}
             </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <span className="text-md font-semibold text-gray-900">Zoom Control:</span>
+            <div className="flex items-center gap-3 h-10 rounded-md shadow-sm">
+              <input
+                type="range"
+                min={50}
+                max={200}
+                step={1}
+                value={zoomPercent}
+                onChange={(event) => onZoomLevelChange(Number(event.target.value) / 100)}
+                className="h-1.5 w-40 cursor-pointer accent-blue-600"
+                aria-label="Zoom level"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 w-12 text-right">{zoomPercent}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 flex-wrap justify-end min-h-6 overflow-x-auto whitespace-nowrap">
+        <span className={`text-sm font-medium text-gray-700 ${selectedFilterTags.length === 0 ? "invisible" : ""}`}>
+          Active:
+        </span>
+        <div className="flex gap-2 justify-end">
+          {selectedFilterTags.map((tag) => {
+            const bandEntry = Object.entries(disciplineBands).find(([, band]) => band.categories.includes(tag))
+            const bandColor = bandEntry ? bandEntry[1].color : "purple"
+            const colorClasses = getColorClasses(bandColor, true)
+
+            return (
+              <Badge
+                key={tag}
+                variant={selectedFilterTags.includes(tag) ? "default" : "secondary"}
+                className={`text-xs cursor-pointer ${colorClasses.bg}`}
+                onClick={() => onToggleFilterTag(tag)}
+              >
+                {tag}
+                <X className="h-3 w-3 ml-1" />
+              </Badge>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

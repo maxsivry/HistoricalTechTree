@@ -12,16 +12,26 @@ interface NodeEditorProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   node?: TechNode | null
-  onSave: (node: TechNode) => void
+  onSave: (node: TechNode) => Promise<void> | void
   onDelete?: (id: string | number) => void
   allNodes: TechNode[]
   categories: string[]
   eras: { id: string; name: string }[]
+  isSaving: boolean
 }
 
 type NodeFormData = Omit<TechNode, "year"> & { year: string | number }
 
-export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes, categories, eras }: NodeEditorProps) {
+export default function NodeEditor({
+  open,
+  onOpenChange,
+  node,
+  onSave,
+  allNodes,
+  categories,
+  eras,
+  isSaving,
+}: NodeEditorProps) {
   const isNewNode = !node?.id
 
   const [formData, setFormData] = useState<NodeFormData>(
@@ -136,7 +146,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
     setPeople((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const titleError = validateTitle(formData.title);
 
     const yearAsNumber = Number(formData.year);
@@ -184,8 +194,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
       nodeToSave.era = era.id
     }
 
-    onSave(nodeToSave)
-    onOpenChange(false)
+    await onSave(nodeToSave)
   }
 
   // Helper function to determine century from year
@@ -238,6 +247,7 @@ export default function NodeEditor({ open, onOpenChange, node, onSave, allNodes,
           onSetNewPerson={setNewPerson}
           onCancel={() => onOpenChange(false)}
           onSave={handleSave}
+          isSaving={isSaving}
         />
 
       </DialogContent>

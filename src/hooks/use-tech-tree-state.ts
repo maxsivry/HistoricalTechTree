@@ -263,7 +263,7 @@ export const useTechTreeState = (initialNodes: TechNode[] = []) => {
         dependencies: n.dependencies?.filter(dep => dep !== nodeId)
     })));
     // Close the dialog if the deleted node was selected
-    if (selectedNode?.id === nodeId) {
+    if (selectedNode && String(selectedNode.id) === String(nodeId)) {
         setDialogOpen(false);
     }
   };
