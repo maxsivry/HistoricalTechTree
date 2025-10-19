@@ -177,7 +177,7 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
     <div className="w-full h-screen flex flex-col">
       <div className="bg-slate-200 dark:bg-slate-800 border-b">
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 md:flex-nowrap md:justify-between">
-          <h1 className="flex-1 text-left text-xl font-bold text-slate-900 dark:text-slate-100 md:text-2xl">
+          <h1 className="flex-1 text-center text-xl font-bold text-slate-900 dark:text-slate-100 md:text-2xl">
             Historical Tech Tree
           </h1>
           <div className="flex flex-wrap justify-end gap-2">
