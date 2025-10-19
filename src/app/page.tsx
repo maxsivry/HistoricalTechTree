@@ -1,6 +1,7 @@
 import TechTreeEditor from '../components/ui/tech-tree-editor'
 import { supabase } from '@/lib/supabaseClient'
 import type { TechNode } from '@/lib/types/tech-tree'
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   // Fetch data on the server
