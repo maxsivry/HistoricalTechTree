@@ -254,7 +254,6 @@ export default function TechTree({
                     Edit Persistent Development
                   </Button>
                   <Button
-                    variant="destructive"
                     onClick={() => onDeleteNode(String(selectedNode.id))}
                     disabled={isDeletingFromDb}
                     className="mt-2"
