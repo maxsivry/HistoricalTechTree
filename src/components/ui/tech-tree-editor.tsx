@@ -175,30 +175,34 @@ export default function TechTreeEditor({ initialTechNodes }: TechTreeEditorProps
 
   return (
     <div className="w-full h-screen flex flex-col">
-      <div className="bg-slate-200 dark:bg-slate-800 p-4 flex items-center border-b relative">
-        <div className="absolute left-1/2 -translate-x-1/2 text-2xl font-bold">Historical Tech Tree</div>
-        <div className="ml-auto flex items-center gap-2">
-          {isTeacher ? (
-            <>
-              <Button variant="materialFilled" onClick={handleAddNode}>
-                <Plus className="mr-2 h-4 w-4" /> Add Development to Database
+      <div className="bg-slate-200 dark:bg-slate-800 border-b">
+        <div className="flex flex-wrap items-center gap-3 px-4 py-3 md:flex-nowrap md:justify-between">
+          <h1 className="flex-1 text-left text-xl font-bold text-slate-900 dark:text-slate-100 md:text-2xl">
+            Historical Tech Tree
+          </h1>
+          <div className="flex flex-wrap justify-end gap-2">
+            {isTeacher ? (
+              <>
+                <Button variant="materialFilled" onClick={handleAddNode}>
+                  <Plus className="mr-2 h-4 w-4" /> Add Development to Database
+                </Button>
+                <Button variant="outline" onClick={endTeacherSession}>Log out</Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Open settings"
+                onClick={() => setSettingsOpen(true)}
+              >
+                <Settings className="h-4 w-4" />
               </Button>
-              <Button variant="outline" onClick={endTeacherSession}>Log out</Button>
-            </>
-          ) : (
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="Open settings"
-              onClick={() => setSettingsOpen(true)}
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-y-auto md:overflow-hidden">
         {/* Pass all state and handlers down to the TechTree component */}
         <TechTree
           nodes={techNodes}

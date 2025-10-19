@@ -12,6 +12,7 @@ import TechTreeControls from "@/components/ui/tech-tree/tech-tree-controls"
 import TechTreeCanvas from "@/components/ui/tech-tree/tech-tree-canvas"
 import AddDevelopmentDialog from "@/components/ui/tech-tree/add-development-dialog"
 import { toExternalHref } from "@/utils/url"
+import MobileTechTree from "@/components/ui/tech-tree/mobile-tech-tree"
 
 
 
@@ -132,30 +133,44 @@ export default function TechTree({
       />
 
       {/* Tech Tree Container */}
-      <div
-        className="flex-1 relative overflow-hidden cursor-move bg-slate-50 dark:bg-slate-900"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-        ref={containerRef}
-      >
-        <TechTreeCanvas
-          techNodes={nodes}
-          selectedFilterTags={selectedFilterTags}
-          centuryPositions={centuryPositions}
-          collapsedCenturies={collapsedCenturies}
-          collapsedEras={collapsedEras}
-          position={position}
-          zoomLevel={zoomLevel}
-          onToggleEraCollapse={toggleEraCollapse}
-          onToggleExpansion={toggleNodeExpansion}
-          onOpenDetails={openNodeDetails}
-          onToggleFilterTag={toggleFilterTag}
-          onAddDevelopment={() => setAddDialogOpen(true)}
-          onClearFilters={clearFilters}
-        />
+      <div className="flex-1 relative">
+        <div
+          className="relative hidden h-full cursor-move overflow-hidden bg-slate-50 dark:bg-slate-900 md:block"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onWheel={handleWheel}
+          ref={containerRef}
+        >
+          <TechTreeCanvas
+            techNodes={nodes}
+            selectedFilterTags={selectedFilterTags}
+            centuryPositions={centuryPositions}
+            collapsedCenturies={collapsedCenturies}
+            collapsedEras={collapsedEras}
+            position={position}
+            zoomLevel={zoomLevel}
+            onToggleEraCollapse={toggleEraCollapse}
+            onToggleExpansion={toggleNodeExpansion}
+            onOpenDetails={openNodeDetails}
+            onToggleFilterTag={toggleFilterTag}
+            onAddDevelopment={() => setAddDialogOpen(true)}
+            onClearFilters={clearFilters}
+          />
+        </div>
+
+        <div className="bg-slate-50 dark:bg-slate-900 md:hidden">
+          <MobileTechTree
+            techNodes={nodes}
+            selectedFilterTags={selectedFilterTags}
+            collapsedEras={collapsedEras}
+            onToggleEraCollapse={toggleEraCollapse}
+            onToggleExpansion={toggleNodeExpansion}
+            onOpenDetails={openNodeDetails}
+            onToggleFilterTag={toggleFilterTag}
+          />
+        </div>
       </div>
 
       {/* Node Details Dialog */}

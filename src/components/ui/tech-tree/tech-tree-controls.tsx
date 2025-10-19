@@ -62,7 +62,7 @@ export default function TechTreeControls({
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-4 md:w-fit md:[grid-template-columns:auto_auto] md:items-start md:justify-items-start">
           <div className="flex flex-col">
-            <div className="flex flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-md font-semibold text-gray-900">Filter Tree by Tags:</span>
               <Badge
                 variant="secondary"
@@ -121,7 +121,7 @@ export default function TechTreeControls({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="hidden flex-col gap-3 md:flex">
             <span className="text-md font-semibold text-gray-900">Zoom Control:</span>
             <div className="flex items-center gap-3 h-10 rounded-md shadow-sm">
               <input
@@ -140,11 +140,11 @@ export default function TechTreeControls({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap justify-end min-h-6 overflow-x-auto whitespace-nowrap">
+      <div className="flex items-center gap-2 flex-wrap justify-start md:justify-end min-h-6 overflow-x-auto whitespace-nowrap">
         <span className={`text-sm font-medium text-gray-700 ${selectedFilterTags.length === 0 ? "invisible" : ""}`}>
           Active:
         </span>
-        <div className="flex gap-2 justify-end">
+        <div className="flex gap-2 justify-start md:justify-end">
           {selectedFilterTags.map((tag) => {
             const bandEntry = Object.entries(disciplineBands).find(([, band]) => band.categories.includes(tag))
             const bandColor = bandEntry ? bandEntry[1].color : "purple"
