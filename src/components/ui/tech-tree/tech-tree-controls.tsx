@@ -62,7 +62,7 @@ export default function TechTreeControls({
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-4 md:w-fit md:[grid-template-columns:auto_auto] md:items-start md:justify-items-start">
           <div className="flex flex-col">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-start gap-2">
               <span className="text-md font-semibold text-gray-900">Filter Tree by Tags:</span>
               <Badge
                 variant="secondary"
